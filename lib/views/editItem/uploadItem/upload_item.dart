@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-import 'package:cartunn/components/button.dart';
-import 'package:cartunn/components/textfield.dart';
+
+import '../../../widgets/custom_text_button.dart';
+import '../../../widgets/custom_text_form_field.dart';
+
 
 class UploadItemPage extends StatefulWidget {
   const UploadItemPage({super.key});
@@ -76,25 +78,25 @@ class UploadItemPageState extends State<UploadItemPage> {
                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Color(0xFF2B3674)),
               ),
               const SizedBox(height: 20),
-              CustomTextField(controller: _nameController, label: 'Name'),
+              CustomTextFormField(controller: _nameController, label: 'Name'),
               const SizedBox(height: 10),
-              CustomTextField(controller: _descriptionController, label: 'Description'),
+              CustomTextFormField(controller: _descriptionController, label: 'Description'),
               const SizedBox(height: 10),
-              CustomTextField(controller: _modelController, label: 'Model'),
+              CustomTextFormField(controller: _modelController, label: 'Model'),
               const SizedBox(height: 10),
-              CustomTextField(controller: _manufacturerController, label: 'Manufacturer'),
+              CustomTextFormField(controller: _manufacturerController, label: 'Manufacturer'),
               const SizedBox(height: 10),
-              CustomTextField(controller: _priceController, label: 'Price'),
+              CustomTextFormField(controller: _priceController, label: 'Price'),
               const SizedBox(height: 10),
-              CustomTextField(controller: _imageController, label: 'Image URL'),
+              CustomTextFormField(controller: _imageController, label: 'Image URL'),
               const SizedBox(height: 10),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  CustomButton(
+                  CustomTextButton(
                     text: 'Upload',
-                    buttonColor: const Color(0xFF5766f5),
-                    textColor: Colors.white,
+                    color: Colors.white,
+                    backgroundColor: const Color(0xFF5766f5),
                     onPressed: _uploadItem,
                   ),
                 ],

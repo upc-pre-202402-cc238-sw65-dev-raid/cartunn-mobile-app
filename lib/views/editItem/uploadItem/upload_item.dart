@@ -17,7 +17,6 @@ class UploadItemPageState extends State<UploadItemPage> {
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
   final TextEditingController _modelController = TextEditingController();
-  final TextEditingController _manufacturerController = TextEditingController();
   final TextEditingController _priceController = TextEditingController();
   final TextEditingController _imageController = TextEditingController();
 
@@ -25,10 +24,9 @@ class UploadItemPageState extends State<UploadItemPage> {
     if (_formKey.currentState!.validate()) {
       const String url = 'https://cartunn.up.railway.app/api/v1/products';
       final Map<String, dynamic> data = {
-        "name": _nameController.text,
+        "title": _nameController.text,
         "description": _descriptionController.text,
         "model": _modelController.text,
-        "manufacturer": _manufacturerController.text,
         "price": double.parse(_priceController.text),
         "image": _imageController.text,
       };
@@ -82,8 +80,6 @@ class UploadItemPageState extends State<UploadItemPage> {
               const SizedBox(height: 10),
               CustomTextField(controller: _modelController, label: 'Model'),
               const SizedBox(height: 10),
-              CustomTextField(controller: _manufacturerController, label: 'Manufacturer'),
-              const SizedBox(height: 10),
               CustomTextField(controller: _priceController, label: 'Price'),
               const SizedBox(height: 10),
               CustomTextField(controller: _imageController, label: 'Image URL'),
@@ -111,7 +107,6 @@ class UploadItemPageState extends State<UploadItemPage> {
     _nameController.dispose();
     _descriptionController.dispose();
     _modelController.dispose();
-    _manufacturerController.dispose();
     _priceController.dispose();
     _imageController.dispose();
     super.dispose();

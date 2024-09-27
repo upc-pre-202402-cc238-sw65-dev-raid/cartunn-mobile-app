@@ -198,7 +198,11 @@ class DetailPage extends StatelessWidget {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Icon(
-                        Icons.check_circle,
+                        order.status == 'completed'
+                            ? Icons.check_circle
+                            : order.status == 'in_process'
+                                ? Icons.hourglass_top
+                                : Icons.cancel,
                         color: order.status == 'completed'
                             ? Colors.green
                             : order.status == 'in_process'

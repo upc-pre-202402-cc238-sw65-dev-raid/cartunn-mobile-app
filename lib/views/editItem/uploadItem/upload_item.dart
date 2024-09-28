@@ -1,8 +1,9 @@
-import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
 import 'dart:convert';
+
 import 'package:cartunn/components/button.dart';
 import 'package:cartunn/components/textfield.dart';
+import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 
 class UploadItemPage extends StatefulWidget {
   const UploadItemPage({super.key});
@@ -16,7 +17,6 @@ class UploadItemPageState extends State<UploadItemPage> {
 
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
-  final TextEditingController _modelController = TextEditingController();
   final TextEditingController _priceController = TextEditingController();
   final TextEditingController _imageController = TextEditingController();
 
@@ -26,7 +26,6 @@ class UploadItemPageState extends State<UploadItemPage> {
       final Map<String, dynamic> data = {
         "title": _nameController.text,
         "description": _descriptionController.text,
-        "model": _modelController.text,
         "price": double.parse(_priceController.text),
         "image": _imageController.text,
       };
@@ -71,14 +70,16 @@ class UploadItemPageState extends State<UploadItemPage> {
             children: [
               const Text(
                 'Upload Item Page',
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Color(0xFF2B3674)),
+                style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xFF2B3674)),
               ),
               const SizedBox(height: 20),
               CustomTextField(controller: _nameController, label: 'Name'),
               const SizedBox(height: 10),
-              CustomTextField(controller: _descriptionController, label: 'Description'),
-              const SizedBox(height: 10),
-              CustomTextField(controller: _modelController, label: 'Model'),
+              CustomTextField(
+                  controller: _descriptionController, label: 'Description'),
               const SizedBox(height: 10),
               CustomTextField(controller: _priceController, label: 'Price'),
               const SizedBox(height: 10),
@@ -106,7 +107,6 @@ class UploadItemPageState extends State<UploadItemPage> {
   void dispose() {
     _nameController.dispose();
     _descriptionController.dispose();
-    _modelController.dispose();
     _priceController.dispose();
     _imageController.dispose();
     super.dispose();

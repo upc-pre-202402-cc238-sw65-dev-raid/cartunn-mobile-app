@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:cartunn/views/editItem/uploadItem/upload_item.dart';
 import 'package:cartunn/views/editItem/updateItem/update_item.dart';
 import 'package:cartunn/views/editItem/removeItem/remove_item.dart';
 import 'package:cartunn/views/editItem/notifyClient/notify_client.dart';
@@ -16,10 +15,9 @@ class EditItemPage extends StatelessWidget {
           children: [
             TabBar(
               labelColor: Color(0xFF5766f5),
-              unselectedLabelColor: Colors.black54,
+              unselectedLabelColor: Colors.black,
               indicatorColor: Color(0xFF5766f5),
               tabs: [
-                Tab(text: 'Upload Item'),
                 Tab(text: 'Update Item'),
                 Tab(text: 'Remove Item'),
                 Tab(text: 'Notify Client'),
@@ -28,7 +26,6 @@ class EditItemPage extends StatelessWidget {
             Expanded(
               child: TabBarView(
                 children: [
-                  UploadItemPage(),
                   UpdateItemPage(),
                   RemoveItemPage(),
                   NotifyClientPage(),

@@ -62,19 +62,22 @@ class UploadItemPageState extends State<UploadItemPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: const Text(
+          'Upload Item Page',
+          style: TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+            color: Colors.black
+          ),
+        ),
+      ),
       body: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
         child: Form(
           key: _formKey,
           child: ListView(
             children: [
-              const Text(
-                'Upload Item Page',
-                style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    color: Color(0xFF2B3674)),
-              ),
               const SizedBox(height: 20),
               CustomTextField(controller: _nameController, label: 'Name'),
               const SizedBox(height: 10),

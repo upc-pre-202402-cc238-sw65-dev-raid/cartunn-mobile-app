@@ -79,7 +79,7 @@ class UpdateItemPageState extends State<UpdateItemPage> {
                 style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
-                    color: Color(0xFF2B3674)),
+                    color: Colors.black),
               ),
               const SizedBox(height: 20),
               CustomTextField(controller: _idController, label: 'ID'),

@@ -1,11 +1,46 @@
 import 'package:flutter/material.dart';
+import 'package:iconsax/iconsax.dart';
+import 'package:another_flutter_splash_screen/another_flutter_splash_screen.dart';
 import 'package:cartunn/views/orders/orders.dart';
+import 'package:cartunn/views/inventory/inventory.dart';
 import 'package:cartunn/views/manageReturns/manage_returns.dart';
 import 'package:cartunn/views/editItem/edit_item.dart';
-import 'package:cartunn/views/help&Center/help_center.dart';
 import 'package:cartunn/views/settings/settings.dart';
 
-void main() => runApp(const BottomNavBarApp());
+void main() => runApp(const SplashScreen());
+
+class SplashScreen extends StatelessWidget {
+  const SplashScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      title: 'Cartunn Mobile App',
+      theme: ThemeData(
+        fontFamily: 'Poppins',
+      ),
+      home: FlutterSplashScreen.scale(
+        gradient: const LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [
+            Color(0xFF5766f5),
+            Color(0xFF5766f5)
+          ],
+        ),
+        childWidget: SizedBox(
+          height: 45,
+          child: Image.asset("../assets/images/cartunn-logo.png"),
+        ),
+        duration: const Duration(milliseconds: 500),
+        animationDuration: const Duration(milliseconds: 400),
+        onAnimationEnd: () => debugPrint("On Scale End"),
+        nextScreen: const BottomNavBarApp(),
+      ),
+    );
+  }
+}
 
 class BottomNavBarApp extends StatelessWidget {
   const BottomNavBarApp({super.key});
@@ -31,11 +66,26 @@ class _BottomNavBarScreenState extends State<BottomNavBarScreen> {
   int _selectedIndex = 0;
 
   static const List<Widget> _pages = [
-    OrdersPage(),
-    ManageReturnsPage(),
-    EditItemPage(),
-    HelpCenterPage(),
-    SettingsPage(),
+    Padding(
+      padding: EdgeInsets.fromLTRB(20, 10, 20, 0),
+      child: InventoryPage(),
+    ),
+    Padding(
+      padding: EdgeInsets.fromLTRB(20, 10, 20, 0),
+      child: OrdersPage(),
+    ),
+    Padding(
+      padding: EdgeInsets.symmetric(horizontal: 24),
+      child: ManageReturnsPage(),
+    ),
+    Padding(
+      padding: EdgeInsets.symmetric(horizontal: 24),
+      child: EditItemPage(),
+    ),
+    Padding(
+      padding: EdgeInsets.symmetric(horizontal: 24),
+      child: SettingsPage(),
+    ),
   ];
 
   void _onItemTapped(int index) {
@@ -47,42 +97,48 @@ class _BottomNavBarScreenState extends State<BottomNavBarScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Cartunn Application'),
-        titleTextStyle: const TextStyle(
-          color: Colors.white,
-          fontSize: 24,
-          fontWeight: FontWeight.w900,
-        ),
-        backgroundColor: const Color(0xFF5766f5),
-      ),
-      body: _pages[_selectedIndex], // Cambia el cuerpo dinámicamente
+      body: _pages[_selectedIndex],
       bottomNavigationBar: BottomNavigationBar(
-        items: const <BottomNavigationBarItem>[
+        items: [
           BottomNavigationBarItem(
-            icon: Icon(Icons.home),
+            icon: Icon(
+              _selectedIndex == 0 ? Iconsax.note4 : Iconsax.note4,
+              color: _selectedIndex == 0 ? const Color(0xFF5766f5) : Colors.black38,
+            ),
+            label: 'Inventory',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(
+              _selectedIndex == 1 ? Iconsax.task_square : Iconsax.task_square,
+              color: _selectedIndex == 1 ? const Color(0xFF5766f5) : Colors.black38,
+            ),
             label: 'Orders',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.business),
+            icon: Icon(
+              _selectedIndex == 2 ? Iconsax.book_square : Iconsax.book_square,
+              color: _selectedIndex == 2 ? const Color(0xFF5766f5) : Colors.black38,
+            ),
             label: 'Manage returns',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.edit),
+            icon: Icon(
+              _selectedIndex == 3 ? Iconsax.edit : Iconsax.edit,
+              color: _selectedIndex == 3 ? const Color(0xFF5766f5) : Colors.black38,
+            ),
             label: 'Edit Item',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.help_center),
-            label: 'Help & Center',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.settings),
+            icon: Icon(
+              _selectedIndex == 4 ? Iconsax.setting_3 : Iconsax.setting_3,
+              color: _selectedIndex == 4 ? const Color(0xFF5766f5) : Colors.black38,
+            ),
             label: 'Settings',
           ),
         ],
         currentIndex: _selectedIndex,
-        unselectedItemColor: Colors.black38,
         selectedItemColor: const Color(0xFF5766f5),
+        unselectedItemColor: Colors.black38,
         showUnselectedLabels: true,
         onTap: _onItemTapped,
       ),

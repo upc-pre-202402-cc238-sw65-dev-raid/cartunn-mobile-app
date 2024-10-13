@@ -8,7 +8,10 @@ class NotifyClientPage extends StatelessWidget {
     return const Center(
       child: Text(
         'Notify Client Page',
-        style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
+        style: TextStyle(
+          fontSize: 30,
+          fontWeight: FontWeight.bold
+        ),
       ),
     );
   }

@@ -11,28 +11,30 @@ class EditItemPage extends StatelessWidget {
     return const DefaultTabController(
       length: 4,
       child: Scaffold(
-        body: Column(
-          children: [
-            TabBar(
-              labelColor: Color(0xFF5766f5),
-              unselectedLabelColor: Colors.black,
-              indicatorColor: Color(0xFF5766f5),
-              tabs: [
-                Tab(text: 'Update Item'),
-                Tab(text: 'Remove Item'),
-                Tab(text: 'Notify Client'),
-              ],
-            ),
-            Expanded(
-              child: TabBarView(
-                children: [
-                  UpdateItemPage(),
-                  RemoveItemPage(),
-                  NotifyClientPage(),
+        body: SafeArea(
+          child: Column(
+            children: [
+              TabBar(
+                labelColor: Color(0xFF5766f5),
+                unselectedLabelColor: Colors.black,
+                indicatorColor: Color(0xFF5766f5),
+                tabs: [
+                  Tab(text: 'Update Item'),
+                  Tab(text: 'Remove Item'),
+                  Tab(text: 'Notify Client'),
                 ],
               ),
-            ),
-          ],
+              Expanded(
+                child: TabBarView(
+                  children: [
+                    UpdateItemPage(),
+                    RemoveItemPage(),
+                    NotifyClientPage(),
+                  ],
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

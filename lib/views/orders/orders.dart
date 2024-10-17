@@ -1,5 +1,4 @@
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
@@ -99,70 +98,116 @@ class DetailPage extends StatelessWidget {
       appBar: AppBar(
         title: Text(order.name),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            ListView(
-              shrinkWrap: true,
-              children: [
-                ListTile(
-                  title: const Text(
-                    'Description',
-                    style: TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                  trailing: SizedBox(
-                    width: 250,
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.end,
+      body: Center(
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Card(
+              elevation: 4,
+              margin: const EdgeInsets.symmetric(horizontal: 16),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Order ID',
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: Colors.grey[600],
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      order.id.toString(),
+                      style: const TextStyle(fontSize: 16),
+                    ),
+                    const SizedBox(height: 16),
+                    Text(
+                      'Description',
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: Colors.grey[600],
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      order.description,
+                      style: const TextStyle(fontSize: 16),
+                    ),
+                    const SizedBox(height: 16),
+                    Text(
+                      'Entry',
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: Colors.grey[600],
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      order.entryDate,
+                      style: const TextStyle(fontSize: 16),
+                    ),
+                    const SizedBox(height: 16),
+                    Text(
+                      'Exit',
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: Colors.grey[600],
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      order.exitDate,
+                      style: const TextStyle(fontSize: 16),
+                    ),
+                    const SizedBox(height: 16),
+                    Text(
+                      'State',
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: Colors.grey[600],
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Row(
                       children: [
-                        Text(order.description, textAlign: TextAlign.right),
+                        Icon(
+                          order.status == 'completed'
+                              ? Icons.check_circle
+                              : order.status == 'in_process'
+                              ? Icons.hourglass_top
+                              : Icons.cancel,
+                          color: order.status == 'completed'
+                              ? Colors.green
+                              : order.status == 'in_process'
+                              ? Colors.orange
+                              : Colors.red,
+                        ),
+                        const SizedBox(width: 8),
+                        Text(
+                          order.status == 'completed'
+                              ? 'Finished'
+                              : order.status == 'in_process'
+                              ? 'In progress'
+                              : 'Cancelled',
+                          style: const TextStyle(fontSize: 16),
+                        ),
                       ],
                     ),
-                  ),
+                  ],
                 ),
-                ListTile(
-                  title: const Text('Date of entry',
-                      style: TextStyle(fontWeight: FontWeight.bold)),
-                  trailing: Text(order.entryDate),
-                ),
-                ListTile(
-                  title: const Text('Date of exit',
-                      style: TextStyle(fontWeight: FontWeight.bold)),
-                  trailing: Text(order.exitDate),
-                ),
-                ListTile(
-                  title: const Text('Status',
-                      style: TextStyle(fontWeight: FontWeight.bold)),
-                  trailing: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(
-                        order.status == 'completed'
-                            ? Icons.check_circle
-                            : order.status == 'in_process'
-                                ? Icons.hourglass_top
-                                : Icons.cancel,
-                        color: order.status == 'completed'
-                            ? Colors.green
-                            : order.status == 'in_process'
-                                ? Colors.orange
-                                : Colors.red,
-                      ),
-                      const SizedBox(width: 8),
-                      Text(order.status == 'completed'
-                          ? 'Completed'
-                          : order.status == 'in_process'
-                              ? 'In progress'
-                              : 'Cancelled'),
-                    ],
-                  ),
-                ),
-              ],
+              ),
             ),
-          ],
+          ),
         ),
       ),
     );
@@ -180,39 +225,44 @@ class ProductDetailPage extends StatelessWidget {
       appBar: AppBar(
         title: Text(product.title),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Image.network(product.image),
-            ListView(
-              shrinkWrap: true,
-              children: [
-                ListTile(
-                  title: const Text(
-                    'Description',
-                    style: TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                  trailing: SizedBox(
-                    width: 250,
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.end,
-                      children: [
-                        Text(product.description, textAlign: TextAlign.right),
-                      ],
+      body: Center(
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Card(
+              elevation: 4,
+              margin: const EdgeInsets.symmetric(horizontal: 16),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Image.network(product.image),
+                    const SizedBox(height: 16),
+                    ListTile(
+                      title: const Text(
+                        'Description',
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                      trailing: SizedBox(
+                        width: 250,
+                        child: Text(product.description,
+                            textAlign: TextAlign.right),
+                      ),
                     ),
-                  ),
+                    ListTile(
+                      title: const Text('Price',
+                          style: TextStyle(fontWeight: FontWeight.bold)),
+                      trailing: Text('\$${product.price}'),
+                    ),
+                  ],
                 ),
-                ListTile(
-                  title: const Text('Price',
-                      style: TextStyle(fontWeight: FontWeight.bold)),
-                  trailing: Text('\$${product.price}'),
-                )
-              ],
-            )
-          ],
+              ),
+            ),
+          ),
         ),
       ),
     );
@@ -220,6 +270,7 @@ class ProductDetailPage extends StatelessWidget {
 }
 
 class Order {
+  final int id;
   final String name;
   final String description;
   final int code;
@@ -228,6 +279,7 @@ class Order {
   final String status;
 
   Order({
+    required this.id,
     required this.name,
     required this.description,
     required this.code,
@@ -238,6 +290,7 @@ class Order {
 
   factory Order.fromJson(Map<String, dynamic> json) {
     return Order(
+      id: json['id'],
       name: json['name'],
       description: json['description'],
       code: json['code'],
@@ -266,7 +319,7 @@ class Product {
       title: json['title'],
       description: json['description'],
       image: json['image'],
-      price: json['price'],
+      price: json['price'].toDouble(),
     );
   }
 }

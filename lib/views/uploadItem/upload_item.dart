@@ -1,9 +1,8 @@
 import 'dart:convert';
-
-import 'package:cartunn/components/button.dart';
 import 'package:cartunn/components/textfield.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:cartunn/views/inventory/entity/product.dart';
 
 class UploadItemPage extends StatefulWidget {
   const UploadItemPage({super.key});
@@ -42,13 +41,17 @@ class UploadItemPageState extends State<UploadItemPage> {
         if (!mounted) return;
 
         if (response.statusCode == 201) {
+          final product = Product.fromJson(jsonDecode(response.body));
+
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('Item uploaded successfully!')),
           );
+          Navigator.of(context).pop(product);
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('Failed to upload item.')),
           );
+          Navigator.of(context).pop();
         }
       } catch (e) {
         if (!mounted) return;
@@ -61,43 +64,51 @@ class UploadItemPageState extends State<UploadItemPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Form(
-          key: _formKey,
-          child: ListView(
-            children: [
-              const Text(
-                'Upload Item Page',
-                style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    color: Color(0xFF2B3674)),
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(20, 20, 20, 20),
+      child: Form(
+        key: _formKey,
+        child: ListView(
+          shrinkWrap: true,
+          children: [
+            const Text(
+              'Upload product',
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 24,
               ),
-              const SizedBox(height: 20),
-              CustomTextField(controller: _nameController, label: 'Name'),
-              const SizedBox(height: 10),
-              CustomTextField(
-                  controller: _descriptionController, label: 'Description'),
-              const SizedBox(height: 10),
-              CustomTextField(controller: _priceController, label: 'Price'),
-              const SizedBox(height: 10),
-              CustomTextField(controller: _imageController, label: 'Image URL'),
-              const SizedBox(height: 10),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  CustomButton(
-                    text: 'Upload',
-                    buttonColor: const Color(0xFF5766f5),
-                    textColor: Colors.white,
-                    onPressed: _uploadItem,
-                  ),
-                ],
+            ),
+            const SizedBox(height: 8),
+            CustomTextField(
+              controller: _nameController,
+              label: 'Name',
+            ),
+            const SizedBox(height: 8),
+            CustomTextField(
+              controller: _descriptionController,
+              label: 'Description',
+            ),
+            const SizedBox(height: 8),
+            CustomTextField(
+              controller: _priceController,
+              label: 'Price',
+            ),
+            const SizedBox(height: 8),
+            CustomTextField(
+              controller: _imageController,
+              label: 'Image URL',
+            ),
+            const SizedBox(height: 8),
+            ElevatedButton(
+              onPressed: _uploadItem,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFF5766f5),
+                foregroundColor: const Color(0xFFFFFFFF),
+                minimumSize: const Size(double.infinity, 50),
               ),
-            ],
-          ),
+              child: const Text('Upload'),
+            ),
+          ],
         ),
       ),
     );

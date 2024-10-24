@@ -1,8 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import '../../components/button.dart';
-import '../../components/textfield.dart';
 
 class ManageReturnsPage extends StatefulWidget {
   const ManageReturnsPage({super.key});
@@ -12,146 +10,266 @@ class ManageReturnsPage extends StatefulWidget {
 }
 
 class _ManageReturnsPageState extends State<ManageReturnsPage> {
-  List<ReturnItem> returns = [];
+  List<ProductRefund> productRefunds = [];
 
   @override
   void initState() {
     super.initState();
-    fetchReturns();
+    fetchProductRefunds();
   }
-
-  Future<void> fetchReturns() async {
+  Future<void> fetchProductRefunds() async {
     final response = await http.get(Uri.parse('https://cartunn.up.railway.app/api/v1/product-refund'));
 
     if (response.statusCode == 200) {
       final data = json.decode(response.body);
       setState(() {
-        returns = List<ReturnItem>.from(data.map((x) => ReturnItem.fromJson(x)));
+        productRefunds = List<ProductRefund>.from(data.map((x) => ProductRefund.fromJson(x)));
       });
     } else {
-      throw Exception('Failed to load returns');
+      throw Exception('Failed to load product refunds');
     }
   }
 
-  void _showEditDialog(ReturnItem returnItem) {
-    final titleController = TextEditingController(text: returnItem.title);
-    final descriptionController = TextEditingController(text: returnItem.description);
-    String selectedStatus = returnItem.status;
+  Future<void> _updateRefundStatus(ProductRefund refund, String newStatus) async {
+    final url = Uri.parse(
+        'https://cartunn.up.railway.app/api/v1/product-refund/${refund.id}');
+    final response = await http.put(
+      url,
+      headers: {'Content-Type': 'application/json'},
+      body: json.encode({
+        'id': refund.id,
+        'title': refund.title,
+        'description': refund.description,
+        'status': newStatus,
+      }),
+    );
+    if (response.statusCode == 200) {
+      setState(() {
+        refund.status = newStatus;
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Status updated successfully!')),
+      );
+    } else {
+      print('Error: ${response.statusCode}');
+      print('Response body: ${response.body}');
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Failed to update status.')),
+      );
+    }
+  }
+  void _openRefundDetailModal(ProductRefund refund) {
+    String selectedStatus = refund.status;
 
-    showDialog(
+    showModalBottomSheet(
       context: context,
+      isScrollControlled: true,
       builder: (context) {
-        return AlertDialog(
-          title: const Text('Edit Return Item'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              CustomTextField(
-                controller: titleController,
-                label: 'Title',
-              ),
-              const SizedBox(height: 10),
-              CustomTextField(
-                controller: descriptionController,
-                label: 'Description',
-              ),
-              const SizedBox(height: 10),
-              DropdownButtonFormField<String>(
-                value: selectedStatus,
-                items: [
-                  'Processed',
-                  'Processing',
-                  'Rejected',
-                ].map((status) {
-                  return DropdownMenuItem<String>(
-                    value: status,
-                    child: Text(status),
-                  );
-                }).toList(),
-                onChanged: (value) {
-                  if (value != null) {
-                    setState(() {
-                      selectedStatus = value;
-                    });
-                  }
-                },
-                decoration: const InputDecoration(labelText: 'Status'),
-              ),
-            ],
+        return Padding(
+          padding: EdgeInsets.only(left: 16, right: 16, top: 16,
+            bottom: MediaQuery.of(context).viewInsets.bottom + 16,
           ),
-          actions: [
-            CustomButton(
-              text: 'Cancel',
-              buttonColor: const Color(0xFF5766f5),
-              textColor: Colors.white,
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
+          child: Container(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(12),
             ),
-            CustomButton(
-              text: 'Save',
-              buttonColor: const Color(0xFF5766f5),
-              textColor: Colors.white,
-              onPressed: () {
-                _updateReturnItem(returnItem, titleController.text, descriptionController.text, selectedStatus);
-                Navigator.of(context).pop();
-              },
+            child: Wrap(
+              children: [
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      refund.title,
+                      style: const TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xFF5766F5),
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      'Description:',
+                      style: TextStyle(fontSize: 16,
+                          color: Colors.grey[600],
+                          fontWeight: FontWeight.bold),
+                    ),
+                    const SizedBox(height: 8),
+                    Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Text(
+                        refund.description,
+                        style: const TextStyle(fontSize: 16),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    Text(
+                      'Status:',
+                      style: TextStyle(fontSize: 16,
+                          color: Colors.grey[600],
+                          fontWeight: FontWeight.bold),
+                    ),
+                    const SizedBox(height: 8),
+                    DropdownButton<String>(
+                      value: selectedStatus,
+                      items: const [
+                        DropdownMenuItem(
+                          value: 'Rejected',
+                          child: Text('Rejected'),
+                        ),
+                        DropdownMenuItem(
+                          value: 'Processing',
+                          child: Text('Processing'),
+                        ),
+                        DropdownMenuItem(
+                          value: 'Processed',
+                          child: Text('Processed'),
+                        ),
+                      ],
+                      onChanged: (value) {
+                        setState(() {
+                          selectedStatus = value!;
+                        });
+                      },
+                    ),
+                    const SizedBox(height: 24),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Expanded(
+                          child: ElevatedButton(
+                            onPressed: () async {
+                              await _updateRefundStatus(refund, selectedStatus);
+                              Navigator.of(context).pop();
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: const Color(0xFF5766F5),
+                              padding: const EdgeInsets.symmetric(vertical: 16),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                            ),
+                            child: const Text(
+                              'SAVE',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 16),
+                        Expanded(
+                          child: ElevatedButton(
+                            onPressed: () {
+                              Navigator.of(context).pop();
+                            },
+                            style: ElevatedButton.styleFrom(
+                              padding: const EdgeInsets.symmetric(vertical: 16),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                            ),
+                            child: const Text(
+                              'CLOSE',
+                              style: TextStyle(
+                                color: Color(0xFF5766F5),
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ],
             ),
-          ],
+          ),
         );
       },
     );
   }
 
-  void _updateReturnItem(ReturnItem returnItem, String title, String description, String status) {
-    setState(() {
-      returns[returns.indexOf(returnItem)] = ReturnItem(
-        title: title,
-        description: description,
-        status: status,
-      );
-    });
+  Icon _buildStatusIcon(String status) {
+    return Icon(
+      status == 'Processed'
+          ? Icons.check_circle
+          : status == 'Processing'
+          ? Icons.access_time
+          : Icons.cancel,
+      color: status == 'Processed'
+          ? Colors.green
+          : status == 'Processing'
+          ? Colors.orange
+          : Colors.red,
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Manage Returns', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 30)),
+        title: const Text('Manage Refunds'),
       ),
       body: ListView.builder(
-        itemCount: returns.length,
+        itemCount: productRefunds.length,
         itemBuilder: (context, index) {
-          final returnItem = returns[index];
+          final refund = productRefunds[index];
           return GestureDetector(
             onTap: () {
-              _showEditDialog(returnItem);
+              _openRefundDetailModal(refund);
             },
             child: Card(
-              child: ListTile(
-                title: Text(returnItem.title),
-                subtitle: Text(returnItem.description),
-                trailing: Row(
-                  mainAxisSize: MainAxisSize.min,
+              elevation: 5,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              margin: const EdgeInsets.symmetric(
+                vertical: 8,
+                horizontal: 16,
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Row(
                   children: [
-                    Icon(
-                      returnItem.status == 'Processed'
-                          ? Icons.check_circle
-                          : returnItem.status == 'Processing'
-                          ? Icons.access_time
-                          : Icons.cancel,
-                      color: returnItem.status == 'Processed'
-                          ? Colors.green
-                          : returnItem.status == 'Processing'
-                          ? Colors.yellow
-                          : Colors.red,
-                    ),
                     const SizedBox(width: 8),
-                    Text(returnItem.status == 'Processed'
-                        ? 'Processed'
-                        : returnItem.status == 'Processing'
-                        ? 'Processing'
-                        : 'Rejected'),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            refund.title,
+                            style: const TextStyle(
+                              color: Color(0xFF5766F5),
+                              fontWeight: FontWeight.bold,
+                              fontSize: 18,
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            refund.description,
+                            style: const TextStyle(fontSize: 16),
+                          ),
+                          const SizedBox(height: 8),
+                          Row(
+                            children: [
+                              _buildStatusIcon(refund.status),
+                              const SizedBox(width: 8),
+                              Text(
+                                refund.status,
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 16,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
                   ],
                 ),
               ),
@@ -163,22 +281,27 @@ class _ManageReturnsPageState extends State<ManageReturnsPage> {
   }
 }
 
-class ReturnItem {
+class ProductRefund {
+  final int id;
   final String title;
   final String description;
-  final String status;
+  String status;
 
-  ReturnItem({
+  ProductRefund({
+    required this.id,
     required this.title,
     required this.description,
     required this.status,
   });
 
-  factory ReturnItem.fromJson(Map<String, dynamic> json) {
-    return ReturnItem(
+  factory ProductRefund.fromJson(Map<String, dynamic> json) {
+    return ProductRefund(
+      id: json['id'],
       title: json['title'],
       description: json['description'],
       status: json['status'],
     );
   }
 }
+
+

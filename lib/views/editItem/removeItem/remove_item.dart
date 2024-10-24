@@ -63,12 +63,19 @@ class RemoveItemPageState extends State<RemoveItemPage> {
             children: [
               const Text(
                 'Remove Item by ID',
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Color(0xFF2B3674)),
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black
+                ),
               ),
               const SizedBox(height: 8),
               const Text(
                 'Are you sure you want to delete this Item(this action es irreversible)?',
-                style: TextStyle(fontSize: 16, color: Color(0xFF2B3674)),
+                style: TextStyle(
+                  fontSize: 16,
+                  color: Colors.black
+                ),
               ),
               const SizedBox(height: 20),
               CustomTextField(controller: _idController, label: 'Item ID'),

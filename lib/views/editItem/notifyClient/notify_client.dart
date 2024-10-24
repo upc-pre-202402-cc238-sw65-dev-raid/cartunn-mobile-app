@@ -9,7 +9,9 @@ class NotifyClientPage extends StatelessWidget {
       child: Text(
         'Notify Client Page',
         style: TextStyle(
-            fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black),
+          fontSize: 30,
+          fontWeight: FontWeight.bold
+        ),
       ),
     );
   }

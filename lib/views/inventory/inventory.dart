@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:iconsax/iconsax.dart';
 import 'package:cartunn/views/uploadItem/upload_item.dart';
+import './entity/product.dart';
+import 'package:cartunn/components/draggable_sheet_component.dart';
 
 class InventoryPage extends StatefulWidget {
   const InventoryPage({super.key});
@@ -13,11 +15,16 @@ class InventoryPage extends StatefulWidget {
 
 class _InventoryPageState extends State<InventoryPage> {
   List<Product> products = [];
+  List<Product> filteredProducts = [];
+  TextEditingController searchController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
     fetchProducts();
+    searchController.addListener(() {
+      filterProducts();
+    });
   }
 
   Future<void> fetchProducts() async {
@@ -27,11 +34,28 @@ class _InventoryPageState extends State<InventoryPage> {
     if (response.statusCode == 200) {
       final data = json.decode(response.body);
       setState(() {
-        products = List<Product>.from(data.map((x) => Product.fromJson(x)));
+        products =
+            List<Product>.from(data.map((x) => Product.fromJson(x))).toList();
+        filteredProducts = products; // Inicialmente mostrar todos los productos
       });
     } else {
       throw Exception('Failed to load products');
     }
+  }
+
+  void filterProducts() {
+    String searchText = searchController.text.toLowerCase();
+    setState(() {
+      filteredProducts = products
+          .where((product) => product.title.toLowerCase().contains(searchText))
+          .toList();
+    });
+  }
+
+  @override
+  void dispose() {
+    searchController.dispose();
+    super.dispose();
   }
 
   @override
@@ -45,11 +69,24 @@ class _InventoryPageState extends State<InventoryPage> {
                 style: TextStyle(fontWeight: FontWeight.bold, fontSize: 24)),
           ),
           Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: TextField(
+              controller: searchController,
+              decoration: InputDecoration(
+                hintText: 'Search by name...',
+                prefixIcon: const Icon(Icons.search),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+            ),
+          ),
+          Padding(
               padding: const EdgeInsets.all(8.0),
               child: GridView.builder(
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
-                itemCount: products.length,
+                itemCount: filteredProducts.length, // Usar la lista filtrada
                 gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: 2,
                   crossAxisSpacing: 10,
@@ -57,14 +94,29 @@ class _InventoryPageState extends State<InventoryPage> {
                   childAspectRatio: 0.75,
                 ),
                 itemBuilder: (context, index) {
-                  final product = products[index];
+                  final product = filteredProducts.reversed
+                      .toList()[index]; // Usar la lista filtrada
                   return GestureDetector(
                     onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) =>
-                              ProductDetailPage(product: product),
+                      showModalBottomSheet(
+                        context: context,
+                        isScrollControlled: true,
+                        backgroundColor: Colors.transparent,
+                        builder: (context) => GestureDetector(
+                          behavior: HitTestBehavior.opaque,
+                          onTap: () {
+                            Navigator.of(context).pop();
+                          },
+                          child: Stack(
+                            children: [
+                              GestureDetector(
+                                onTap: () {},
+                                child: DraggableSheetComponent(
+                                  child: ProductDetailContent(product: product),
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                       );
                     },
@@ -100,96 +152,105 @@ class _InventoryPageState extends State<InventoryPage> {
         ],
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => const UploadItemPage()),
+        onPressed: () async {
+          // Mostrar el modal y esperar el nuevo producto
+          final newProduct = await showModalBottomSheet<Product>(
+            context: context,
+            isScrollControlled: true,
+            backgroundColor: Colors.transparent,
+            builder: (context) => GestureDetector(
+              behavior: HitTestBehavior.opaque,
+              onTap: () {
+                Navigator.of(context).pop();
+              },
+              child: Stack(
+                children: [
+                  GestureDetector(
+                    onTap: () {},
+                    child: const DraggableSheetComponent(
+                      child: UploadItemPage(),
+                    ),
+                  ),
+                ],
+              ),
+            ),
           );
+
+          // Verificar si se creó un nuevo producto
+          if (newProduct != null) {
+            setState(() {
+              // Insertar el nuevo producto al principio de la lista
+              products.insert(0, newProduct);
+              filterProducts(); // Asegurarse de que la lista filtrada se actualice
+            });
+          }
         },
         backgroundColor: const Color(0xFF5766f5),
         child: const Icon(
           Iconsax.add,
-          color: Colors.white, // Ícono blanco
+          color: Colors.white,
         ),
       ),
     );
   }
 }
 
-class ProductDetailPage extends StatelessWidget {
+class ProductDetailContent extends StatelessWidget {
   final Product product;
 
-  const ProductDetailPage({super.key, required this.product});
+  const ProductDetailContent({super.key, required this.product});
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(product.title),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Image.network(
-              product.image,
-              fit: BoxFit.cover,
-              width: double.infinity,
-              height: 600,
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            product.title,
+            style: const TextStyle(
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
             ),
-            ListView(
-              shrinkWrap: true,
-              children: [
-                ListTile(
-                  title: const Text(
-                    'Description',
-                    style: TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                  trailing: SizedBox(
-                    width: 250,
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.end,
-                      children: [
-                        Text(product.description, textAlign: TextAlign.right),
-                      ],
-                    ),
-                  ),
-                ),
-                ListTile(
-                  title: const Text('Price',
-                      style: TextStyle(fontWeight: FontWeight.bold)),
-                  trailing: Text('\$${product.price}'),
-                )
-              ],
-            )
-          ],
-        ),
+          ),
+          const SizedBox(height: 4),
+          Image.network(
+            product.image,
+            height: 200,
+            width: 200,
+            alignment: Alignment.center,
+          ),
+          const SizedBox(height: 4),
+          Text(
+            'Description',
+            style: TextStyle(
+              fontSize: 16,
+              color: Colors.grey[600],
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            product.description,
+            style: const TextStyle(fontSize: 16),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            'Price',
+            style: TextStyle(
+              fontSize: 16,
+              color: Colors.grey[600],
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            '\$${product.price}',
+            style: const TextStyle(fontSize: 16),
+          ),
+        ],
       ),
-    );
-  }
-}
-
-class Product {
-  final String title;
-  final String description;
-  final String image;
-  final double price;
-
-  Product({
-    required this.title,
-    required this.description,
-    required this.image,
-    required this.price,
-  });
-
-  factory Product.fromJson(Map<String, dynamic> json) {
-    return Product(
-      title: json['title'],
-      description: json['description'],
-      image: json['image'],
-      price: json['price'],
     );
   }
 }

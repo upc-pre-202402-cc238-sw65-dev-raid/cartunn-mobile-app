@@ -17,24 +17,20 @@ class _ManageReturnsPageState extends State<ManageReturnsPage> {
     super.initState();
     fetchProductRefunds();
   }
-
   Future<void> fetchProductRefunds() async {
-    final response = await http
-        .get(Uri.parse('https://cartunn.up.railway.app/api/v1/product-refund'));
+    final response = await http.get(Uri.parse('https://cartunn.up.railway.app/api/v1/product-refund'));
 
     if (response.statusCode == 200) {
       final data = json.decode(response.body);
       setState(() {
-        productRefunds = List<ProductRefund>.from(
-            data.map((x) => ProductRefund.fromJson(x)));
+        productRefunds = List<ProductRefund>.from(data.map((x) => ProductRefund.fromJson(x)));
       });
     } else {
       throw Exception('Failed to load product refunds');
     }
   }
 
-  Future<void> _updateRefundStatus(
-      ProductRefund refund, String newStatus) async {
+  Future<void> _updateRefundStatus(ProductRefund refund, String newStatus) async {
     final url = Uri.parse(
         'https://cartunn.up.railway.app/api/v1/product-refund/${refund.id}');
     final response = await http.put(
@@ -62,7 +58,6 @@ class _ManageReturnsPageState extends State<ManageReturnsPage> {
       );
     }
   }
-
   void _openRefundDetailModal(ProductRefund refund) {
     String selectedStatus = refund.status;
 
@@ -71,10 +66,7 @@ class _ManageReturnsPageState extends State<ManageReturnsPage> {
       isScrollControlled: true,
       builder: (context) {
         return Padding(
-          padding: EdgeInsets.only(
-            left: 16,
-            right: 16,
-            top: 16,
+          padding: EdgeInsets.only(left: 16, right: 16, top: 16,
             bottom: MediaQuery.of(context).viewInsets.bottom + 16,
           ),
           child: Container(
@@ -97,8 +89,7 @@ class _ManageReturnsPageState extends State<ManageReturnsPage> {
                     const SizedBox(height: 8),
                     Text(
                       'Description:',
-                      style: TextStyle(
-                          fontSize: 16,
+                      style: TextStyle(fontSize: 16,
                           color: Colors.grey[600],
                           fontWeight: FontWeight.bold),
                     ),
@@ -116,8 +107,7 @@ class _ManageReturnsPageState extends State<ManageReturnsPage> {
                     const SizedBox(height: 16),
                     Text(
                       'Status:',
-                      style: TextStyle(
-                          fontSize: 16,
+                      style: TextStyle(fontSize: 16,
                           color: Colors.grey[600],
                           fontWeight: FontWeight.bold),
                     ),
@@ -208,92 +198,84 @@ class _ManageReturnsPageState extends State<ManageReturnsPage> {
       status == 'Processed'
           ? Icons.check_circle
           : status == 'Processing'
-              ? Icons.access_time
-              : Icons.cancel,
+          ? Icons.access_time
+          : Icons.cancel,
       color: status == 'Processed'
           ? Colors.green
           : status == 'Processing'
-              ? Colors.orange
-              : Colors.red,
+          ? Colors.orange
+          : Colors.red,
     );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: ListView(
-        children: [
-          const Padding(
-            padding: EdgeInsets.all(8.0),
-            child: Text('Manage Refunds',
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 24)),
-          ),
-          ListView.builder(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            itemCount: productRefunds.length,
-            itemBuilder: (context, index) {
-              final refund = productRefunds[index];
-              return GestureDetector(
-                onTap: () {
-                  _openRefundDetailModal(refund);
-                },
-                child: Card(
-                  elevation: 5,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  margin: const EdgeInsets.symmetric(
-                    vertical: 8,
-                    horizontal: 8,
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: Row(
-                      children: [
-                        const SizedBox(width: 8),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
+      appBar: AppBar(
+        title: const Text('Manage Refunds'),
+      ),
+      body: ListView.builder(
+        itemCount: productRefunds.length,
+        itemBuilder: (context, index) {
+          final refund = productRefunds[index];
+          return GestureDetector(
+            onTap: () {
+              _openRefundDetailModal(refund);
+            },
+            child: Card(
+              elevation: 5,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              margin: const EdgeInsets.symmetric(
+                vertical: 8,
+                horizontal: 16,
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Row(
+                  children: [
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            refund.title,
+                            style: const TextStyle(
+                              color: Color(0xFF5766F5),
+                              fontWeight: FontWeight.bold,
+                              fontSize: 18,
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            refund.description,
+                            style: const TextStyle(fontSize: 16),
+                          ),
+                          const SizedBox(height: 8),
+                          Row(
                             children: [
+                              _buildStatusIcon(refund.status),
+                              const SizedBox(width: 8),
                               Text(
-                                refund.title,
+                                refund.status,
                                 style: const TextStyle(
-                                  color: Color(0xFF5766F5),
                                   fontWeight: FontWeight.bold,
-                                  fontSize: 18,
+                                  fontSize: 16,
                                 ),
-                              ),
-                              const SizedBox(height: 8),
-                              Text(
-                                refund.description,
-                                style: const TextStyle(fontSize: 16),
-                              ),
-                              const SizedBox(height: 8),
-                              Row(
-                                children: [
-                                  _buildStatusIcon(refund.status),
-                                  const SizedBox(width: 8),
-                                  Text(
-                                    refund.status,
-                                    style: const TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 16,
-                                    ),
-                                  ),
-                                ],
                               ),
                             ],
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
-                  ),
+                  ],
                 ),
-              );
-            },
-          ),
-        ],
+              ),
+            ),
+          );
+        },
       ),
     );
   }
@@ -321,3 +303,5 @@ class ProductRefund {
     );
   }
 }
+
+

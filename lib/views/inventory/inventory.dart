@@ -132,7 +132,12 @@ class ProductDetailPage extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Image.network(product.image),
+            Image.network(
+              product.image,
+              fit: BoxFit.cover,
+              width: double.infinity,
+              height: 600,
+            ),
             ListView(
               shrinkWrap: true,
               children: [

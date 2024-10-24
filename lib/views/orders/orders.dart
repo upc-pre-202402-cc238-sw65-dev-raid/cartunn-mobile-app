@@ -41,31 +41,51 @@ class _OrdersPageState extends State<OrdersPage> {
           const Padding(
             padding: EdgeInsets.all(8.0),
             child: Text('Orders',
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 40)),
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 24)),
           ),
-          ListView.builder(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            itemCount: orders.length,
-            itemBuilder: (context, index) {
-              final order = orders[index];
-              return GestureDetector(
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => DetailPage(order: order),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: GridView.builder(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              itemCount: orders.length,
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2, // Dos columnas
+                crossAxisSpacing: 10, // Espacio horizontal entre las cards
+                mainAxisSpacing: 10, // Espacio vertical entre las cards
+                childAspectRatio:
+                    2, // Relación de aspecto para que la card sea más ancha que alta
+              ),
+              itemBuilder: (context, index) {
+                final order = orders[index];
+                return GestureDetector(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => DetailPage(order: order),
+                      ),
+                    );
+                  },
+                  child: Card(
+                    elevation: 4,
+                    child: Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Center(
+                        child: Text(
+                          order.name,
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
                     ),
-                  );
-                },
-                child: Card(
-                  child: ListTile(
-                    title: Text(order.name),
                   ),
-                ),
-              );
-            },
-          )
+                );
+              },
+            ),
+          ),
         ],
       ),
     );

@@ -24,10 +24,7 @@ class SplashScreen extends StatelessWidget {
         gradient: const LinearGradient(
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
-          colors: [
-            Color(0xFF5766f5),
-            Color(0xFF5766f5)
-          ],
+          colors: [Color(0xFF5766f5), Color(0xFF5766f5)],
         ),
         childWidget: SizedBox(
           height: 45,
@@ -47,10 +44,11 @@ class BottomNavBarApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
+    return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Cartunn Mobile App',
-      home: BottomNavBarScreen(),
+      theme: Theme.of(context),
+      home: const BottomNavBarScreen(),
     );
   }
 }
@@ -103,35 +101,45 @@ class _BottomNavBarScreenState extends State<BottomNavBarScreen> {
           BottomNavigationBarItem(
             icon: Icon(
               _selectedIndex == 0 ? Iconsax.note4 : Iconsax.note4,
-              color: _selectedIndex == 0 ? const Color(0xFF5766f5) : Colors.black38,
+              color: _selectedIndex == 0
+                  ? const Color(0xFF5766f5)
+                  : Colors.black38,
             ),
             label: 'Inventory',
           ),
           BottomNavigationBarItem(
             icon: Icon(
               _selectedIndex == 1 ? Iconsax.task_square : Iconsax.task_square,
-              color: _selectedIndex == 1 ? const Color(0xFF5766f5) : Colors.black38,
+              color: _selectedIndex == 1
+                  ? const Color(0xFF5766f5)
+                  : Colors.black38,
             ),
             label: 'Orders',
           ),
           BottomNavigationBarItem(
             icon: Icon(
               _selectedIndex == 2 ? Iconsax.book_square : Iconsax.book_square,
-              color: _selectedIndex == 2 ? const Color(0xFF5766f5) : Colors.black38,
+              color: _selectedIndex == 2
+                  ? const Color(0xFF5766f5)
+                  : Colors.black38,
             ),
             label: 'Manage returns',
           ),
           BottomNavigationBarItem(
             icon: Icon(
               _selectedIndex == 3 ? Iconsax.edit : Iconsax.edit,
-              color: _selectedIndex == 3 ? const Color(0xFF5766f5) : Colors.black38,
+              color: _selectedIndex == 3
+                  ? const Color(0xFF5766f5)
+                  : Colors.black38,
             ),
             label: 'Edit Item',
           ),
           BottomNavigationBarItem(
             icon: Icon(
               _selectedIndex == 4 ? Iconsax.setting_3 : Iconsax.setting_3,
-              color: _selectedIndex == 4 ? const Color(0xFF5766f5) : Colors.black38,
+              color: _selectedIndex == 4
+                  ? const Color(0xFF5766f5)
+                  : Colors.black38,
             ),
             label: 'Settings',
           ),

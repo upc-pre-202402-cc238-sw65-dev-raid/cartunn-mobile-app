@@ -62,8 +62,13 @@ class _OrdersPageState extends State<OrdersPage> {
         children: [
           const Padding(
             padding: EdgeInsets.all(8.0),
-            child: Text('Orders',
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 40)),
+            child: Text(
+              'Orders',
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 30,
+              ),
+            ),
           ),
           Padding(
             padding: const EdgeInsets.all(8.0),
@@ -78,44 +83,73 @@ class _OrdersPageState extends State<OrdersPage> {
               ),
             ),
           ),
-          ListView.builder(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            itemCount: filteredOrders.length,
-            itemBuilder: (context, index) {
-              final order = filteredOrders[index];
-              return GestureDetector(
-                onTap: () {
-                  showModalBottomSheet(
-                    context: context,
-                    isScrollControlled: true,
-                    backgroundColor: Colors.transparent,
-                    isDismissible: true,
-                    builder: (context) => GestureDetector(
-                      behavior: HitTestBehavior.opaque,
-                      onTap: () {
-                        Navigator.of(context).pop();
-                      },
-                      child: Stack(
-                        children: [
-                          GestureDetector(
-                            onTap: () {},
-                            child: DraggableSheetComponent(
-                              child: OrderDetailContent(order: order),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: GridView.builder(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              itemCount: filteredOrders.length,
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+                crossAxisSpacing: 10,
+                mainAxisSpacing: 10,
+                childAspectRatio: 0.75,
+              ),
+              itemBuilder: (context, index) {
+                final order = filteredOrders.reversed.toList()[index];
+                return GestureDetector(
+                  onTap: () {
+                    showModalBottomSheet(
+                      context: context,
+                      isScrollControlled: true,
+                      backgroundColor: Colors.transparent,
+                      builder: (context) => GestureDetector(
+                        behavior: HitTestBehavior.opaque,
+                        onTap: () {
+                          Navigator.of(context).pop();
+                        },
+                        child: Stack(
+                          children: [
+                            GestureDetector(
+                              onTap: () {},
+                              child: DraggableSheetComponent(
+                                child: OrderDetailContent(order: order),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    );
+                  },
+                  child: Card(
+                    child: Column(
+                      children: [
+                        Expanded(
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(8),
+                            child: Image.network(
+                              order.imageUrl,
+                              fit: BoxFit.contain,
                             ),
                           ),
-                        ],
-                      ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Text(
+                            order.name,
+                            style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                      ],
                     ),
-                  );
-                },
-                child: Card(
-                  child: ListTile(
-                    title: Text(order.name),
                   ),
-                ),
-              );
-            },
+                );
+              },
+            ),
           ),
         ],
       ),
@@ -131,7 +165,7 @@ class OrderDetailContent extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.all(16.0),
+      padding: const EdgeInsets.all(32.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -143,11 +177,13 @@ class OrderDetailContent extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 4),
-          Image(
-            image: NetworkImage(order.imageUrl),
-            height: 200,
-            width: 200,
-            alignment: Alignment.center,
+          SizedBox(
+            width: double.infinity,
+            child: Image.network(
+              order.imageUrl,
+              height: 200,
+              fit: BoxFit.contain,
+            ),
           ),
           const SizedBox(height: 4),
           Text(

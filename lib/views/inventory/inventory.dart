@@ -36,7 +36,7 @@ class _InventoryPageState extends State<InventoryPage> {
       setState(() {
         products =
             List<Product>.from(data.map((x) => Product.fromJson(x))).toList();
-        filteredProducts = products; // Inicialmente mostrar todos los productos
+        filteredProducts = products;
       });
     } else {
       throw Exception('Failed to load products');
@@ -66,7 +66,10 @@ class _InventoryPageState extends State<InventoryPage> {
           const Padding(
             padding: EdgeInsets.all(8.0),
             child: Text('Inventory',
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 24)),
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 30,
+                )),
           ),
           Padding(
             padding: const EdgeInsets.all(8.0),
@@ -82,73 +85,72 @@ class _InventoryPageState extends State<InventoryPage> {
             ),
           ),
           Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: GridView.builder(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                itemCount: filteredProducts.length, // Usar la lista filtrada
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2,
-                  crossAxisSpacing: 10,
-                  mainAxisSpacing: 10,
-                  childAspectRatio: 0.75,
-                ),
-                itemBuilder: (context, index) {
-                  final product = filteredProducts.reversed
-                      .toList()[index]; // Usar la lista filtrada
-                  return GestureDetector(
-                    onTap: () {
-                      showModalBottomSheet(
-                        context: context,
-                        isScrollControlled: true,
-                        backgroundColor: Colors.transparent,
-                        builder: (context) => GestureDetector(
-                          behavior: HitTestBehavior.opaque,
-                          onTap: () {
-                            Navigator.of(context).pop();
-                          },
-                          child: Stack(
-                            children: [
-                              GestureDetector(
-                                onTap: () {},
-                                child: DraggableSheetComponent(
-                                  child: ProductDetailContent(product: product),
-                                ),
+            padding: const EdgeInsets.all(8.0),
+            child: GridView.builder(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              itemCount: filteredProducts.length,
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+                crossAxisSpacing: 10,
+                mainAxisSpacing: 10,
+                childAspectRatio: 0.75,
+              ),
+              itemBuilder: (context, index) {
+                final product = filteredProducts.reversed.toList()[index];
+                return GestureDetector(
+                  onTap: () {
+                    showModalBottomSheet(
+                      context: context,
+                      isScrollControlled: true,
+                      backgroundColor: Colors.transparent,
+                      builder: (context) => GestureDetector(
+                        behavior: HitTestBehavior.opaque,
+                        onTap: () {
+                          Navigator.of(context).pop();
+                        },
+                        child: Stack(
+                          children: [
+                            GestureDetector(
+                              onTap: () {},
+                              child: DraggableSheetComponent(
+                                child: ProductDetailContent(product: product),
                               ),
-                            ],
+                            ),
+                          ],
+                        ),
+                      ),
+                    );
+                  },
+                  child: Card(
+                    elevation: 4,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Expanded(
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(8),
+                            child: Image.network(
+                              product.image,
+                              fit: BoxFit.contain,
+                            ),
                           ),
                         ),
-                      );
-                    },
-                    child: Card(
-                      elevation: 4,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          Expanded(
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.circular(8),
-                              child: Image.network(
-                                product.image,
-                                fit: BoxFit.contain,
-                              ),
-                            ),
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Text(
+                            product.title,
+                            style: const TextStyle(fontWeight: FontWeight.bold),
+                            textAlign: TextAlign.center,
                           ),
-                          Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Text(
-                              product.title,
-                              style:
-                                  const TextStyle(fontWeight: FontWeight.bold),
-                              textAlign: TextAlign.center,
-                            ),
-                          ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
-                  );
-                },
-              )),
+                  ),
+                );
+              },
+            ),
+          ),
         ],
       ),
       floatingActionButton: FloatingActionButton(
@@ -175,13 +177,10 @@ class _InventoryPageState extends State<InventoryPage> {
               ),
             ),
           );
-
-          // Verificar si se creó un nuevo producto
           if (newProduct != null) {
             setState(() {
-              // Insertar el nuevo producto al principio de la lista
               products.insert(0, newProduct);
-              filterProducts(); // Asegurarse de que la lista filtrada se actualice
+              filterProducts();
             });
           }
         },
@@ -203,9 +202,10 @@ class ProductDetailContent extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.all(16.0),
+      padding: const EdgeInsets.all(32.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Text(
             product.title,
@@ -215,11 +215,13 @@ class ProductDetailContent extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 4),
-          Image.network(
-            product.image,
-            height: 200,
-            width: 200,
-            alignment: Alignment.center,
+          SizedBox(
+            width: double.infinity,
+            child: Image.network(
+              product.image,
+              height: 200,
+              fit: BoxFit.contain,
+            ),
           ),
           const SizedBox(height: 4),
           Text(

@@ -28,10 +28,11 @@ class SplashScreen extends StatelessWidget {
         ),
         childWidget: SizedBox(
           height: 45,
-          child: Image.asset("../assets/images/cartunn-logo.png"),
+          // mi logo se encuentra en la ruta assets/images/cartunn-logo.png
+          child: Image.asset('assets/images/cartunn-logo.png'),
         ),
-        duration: const Duration(milliseconds: 500),
-        animationDuration: const Duration(milliseconds: 400),
+        duration: const Duration(milliseconds: 3000),
+        animationDuration: const Duration(milliseconds: 500),
         onAnimationEnd: () => debugPrint("On Scale End"),
         nextScreen: const BottomNavBarApp(),
       ),

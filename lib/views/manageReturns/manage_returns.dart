@@ -1,7 +1,8 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:cartunn/components/button.dart';
 import 'package:http/http.dart' as http;
-import 'entity/manage_return.dart'; // Asegúrate de que este archivo existe y tiene la clase ProductRefund.
+import './entity/manage_return.dart'; 
 import 'package:cartunn/components/draggable_sheet_component.dart';
 
 class ManageReturnsPage extends StatefulWidget {
@@ -156,6 +157,7 @@ class _ManageReturnsPageState extends State<ManageReturnsPage> {
                             style: const TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.bold,
+                              color: Color(0xFF5766F5),
                             ),
                             textAlign: TextAlign.center,
                           ),
@@ -293,46 +295,25 @@ class _ProductRefundDetailContentState extends State<ProductRefundDetailContent>
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
               Expanded(
-                child: ElevatedButton(
+                child: CustomButton(
+                  text: 'SAVE',
+                  buttonColor: const Color(0xFF5766F5),
+                  textColor: Colors.white,
                   onPressed: () {
                     widget.onSave(_selectedStatus);
                     Navigator.of(context).pop();
                   },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF5766F5),
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
-                  child: const Text(
-                    'SAVE',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
                 ),
               ),
               const SizedBox(width: 16),
               Expanded(
-                child: ElevatedButton(
+                child: CustomButton(
+                  text: 'CLOSE',
+                  buttonColor: const Color.fromARGB(255, 255, 252, 252),
+                  textColor: const Color(0xFF5766F5),
                   onPressed: () {
                     Navigator.of(context).pop();
                   },
-                  style: ElevatedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
-                  child: const Text(
-                    'CLOSE',
-                    style: TextStyle(
-                      color: Color(0xFF5766F5),
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
                 ),
               ),
             ],

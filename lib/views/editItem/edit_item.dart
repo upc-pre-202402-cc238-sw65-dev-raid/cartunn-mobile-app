@@ -9,7 +9,7 @@ class EditItemPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return const DefaultTabController(
-      length: 4,
+      length: 3,
       child: Scaffold(
         body: SafeArea(
           child: Column(

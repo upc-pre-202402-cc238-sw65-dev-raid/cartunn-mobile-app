@@ -86,8 +86,7 @@ class UpdateItemPageState extends State<UpdateItemPage> {
               const SizedBox(height: 10),
               CustomTextField(controller: _nameController, label: 'Name'),
               const SizedBox(height: 10),
-              CustomTextField(
-                  controller: _descriptionController, label: 'Description'),
+              CustomTextField(controller: _descriptionController, label: 'Description'),
               const SizedBox(height: 10),
               CustomTextField(controller: _priceController, label: 'Price'),
               const SizedBox(height: 10),

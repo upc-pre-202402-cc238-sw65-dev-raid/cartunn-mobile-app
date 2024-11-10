@@ -2,12 +2,30 @@ import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:another_flutter_splash_screen/another_flutter_splash_screen.dart';
 import 'package:cartunn/views/orders/orders.dart';
-import 'package:cartunn/views/inventory/inventory.dart';
+import 'package:cartunn/features/inventory/presentation/pages/inventory_page.dart';
 import 'package:cartunn/views/manageReturns/manage_returns.dart';
 import 'package:cartunn/views/editItem/edit_item.dart';
 import 'package:cartunn/views/settings/settings.dart';
+import 'package:get_it/get_it.dart';
+import 'package:http/http.dart' as http;
+import 'package:cartunn/features/inventory/data/datasources/inventory_remote_datasource.dart';
+import 'package:cartunn/features/inventory/data/repositories/inventory_repository_impl.dart';
+import 'package:cartunn/features/inventory/domain/repositories/inventory_repository.dart';
+import 'package:cartunn/features/inventory/domain/usecases/get_products_usecase.dart';
 
-void main() => runApp(const SplashScreen());
+void main() {
+  WidgetsFlutterBinding.ensureInitialized();
+  final getIt = GetIt.instance;
+  getIt.registerLazySingleton(() => http.Client());
+  getIt.registerLazySingleton(() => InventoryRemoteDatasource());
+  getIt
+      .registerLazySingleton<InventoryRepository>(() => InventoryRepositoryImpl(
+            remoteDatasource: getIt(),
+          ));
+  getIt.registerLazySingleton(() => GetProductsUseCase(repository: getIt()));
+
+  runApp(const SplashScreen());
+}
 
 class SplashScreen extends StatelessWidget {
   const SplashScreen({super.key});
@@ -28,7 +46,6 @@ class SplashScreen extends StatelessWidget {
         ),
         childWidget: SizedBox(
           height: 45,
-          // mi logo se encuentra en la ruta assets/images/cartunn-logo.png
           child: Image.asset('assets/images/cartunn-logo.png'),
         ),
         duration: const Duration(milliseconds: 3000),
@@ -64,24 +81,26 @@ class BottomNavBarScreen extends StatefulWidget {
 class _BottomNavBarScreenState extends State<BottomNavBarScreen> {
   int _selectedIndex = 0;
 
-  static const List<Widget> _pages = [
+  static final List<Widget> _pages = [
     Padding(
-      padding: EdgeInsets.fromLTRB(20, 10, 20, 0),
-      child: InventoryPage(),
+      padding: const EdgeInsets.fromLTRB(20, 10, 20, 0),
+      child: InventoryView(
+        getProductsUseCase: GetIt.I<GetProductsUseCase>(),
+      ),
     ),
-    Padding(
+    const Padding(
       padding: EdgeInsets.fromLTRB(20, 10, 20, 0),
       child: OrdersPage(),
     ),
-    Padding(
+    const Padding(
       padding: EdgeInsets.symmetric(horizontal: 24),
       child: ManageReturnsPage(),
     ),
-    Padding(
+    const Padding(
       padding: EdgeInsets.symmetric(horizontal: 24),
       child: EditItemPage(),
     ),
-    Padding(
+    const Padding(
       padding: EdgeInsets.symmetric(horizontal: 24),
       child: SettingsPage(),
     ),

@@ -1,19 +1,23 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
 import 'package:iconsax/iconsax.dart';
 import 'package:cartunn/views/uploadItem/upload_item.dart';
-import './entity/product.dart';
 import 'package:cartunn/components/draggable_sheet_component.dart';
+import 'package:cartunn/features/inventory/domain/entities/product.dart';
+import 'package:cartunn/features/inventory/domain/usecases/get_products_usecase.dart';
+import 'package:cartunn/features/inventory/presentation/widgets/product_detail_content.dart';
+import 'package:cartunn/presentation/widgets/search_input.dart';
 
-class InventoryPage extends StatefulWidget {
-  const InventoryPage({super.key});
+class InventoryView extends StatefulWidget {
+  final GetProductsUseCase getProductsUseCase;
+
+  const InventoryView({Key? key, required this.getProductsUseCase})
+      : super(key: key);
 
   @override
-  _InventoryPageState createState() => _InventoryPageState();
+  InventoryViewState createState() => InventoryViewState();
 }
 
-class _InventoryPageState extends State<InventoryPage> {
+class InventoryViewState extends State<InventoryView> {
   List<Product> products = [];
   List<Product> filteredProducts = [];
   TextEditingController searchController = TextEditingController();
@@ -21,32 +25,24 @@ class _InventoryPageState extends State<InventoryPage> {
   @override
   void initState() {
     super.initState();
-    fetchProducts();
+    _fetchProducts();
     searchController.addListener(() {
       filterProducts();
     });
   }
 
-  Future<void> fetchProducts() async {
-    final response = await http
-        .get(Uri.parse('https://cartunn.up.railway.app/api/v1/products'));
-
-    if (response.statusCode == 200) {
-      final data = json.decode(response.body);
-      setState(() {
-        products =
-            List<Product>.from(data.map((x) => Product.fromJson(x))).toList();
-        filteredProducts = products;
-      });
-    } else {
-      throw Exception('Failed to load products');
-    }
+  Future<void> _fetchProducts() async {
+    final result = await widget.getProductsUseCase.call();
+    setState(() {
+      products = result;
+      filteredProducts = products.reversed.toList();
+    });
   }
 
   void filterProducts() {
     String searchText = searchController.text.toLowerCase();
     setState(() {
-      filteredProducts = products
+      filteredProducts = products.reversed
           .where((product) => product.title.toLowerCase().contains(searchText))
           .toList();
     });
@@ -61,43 +57,40 @@ class _InventoryPageState extends State<InventoryPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: ListView(
-        children: [
-          const Padding(
-            padding: EdgeInsets.all(8.0),
-            child: Text('Inventory',
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 30,
-                )),
+      appBar: AppBar(
+        title: const Text(
+          'Inventory',
+          style: TextStyle(
+            fontSize: 30,
+            fontWeight: FontWeight.bold,
           ),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: TextField(
-              controller: searchController,
-              decoration: InputDecoration(
-                hintText: 'Search by name...',
-                prefixIcon: const Icon(Icons.search),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-              ),
+        ),
+      ),
+      body: CustomScrollView(
+        slivers: [
+          SliverAppBar(
+            title: SearchInput(
+                controller: searchController,
+                hintText: "Write here ...",
+                onChanged: (value) {
+                  filterProducts();
+                }),
+            floating: true,
+            pinned: true,
+            titleSpacing: 0,
+            toolbarHeight: 80,
+            leadingWidth: 8,
+          ),
+          SliverGrid(
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 2,
+              crossAxisSpacing: 8,
+              mainAxisSpacing: 8,
+              childAspectRatio: 0.75,
             ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: GridView.builder(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              itemCount: filteredProducts.length,
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
-                crossAxisSpacing: 10,
-                mainAxisSpacing: 10,
-                childAspectRatio: 0.75,
-              ),
-              itemBuilder: (context, index) {
-                final product = filteredProducts.reversed.toList()[index];
+            delegate: SliverChildBuilderDelegate(
+              (context, index) {
+                final product = filteredProducts[index];
                 return GestureDetector(
                   onTap: () {
                     showModalBottomSheet(
@@ -132,7 +125,7 @@ class _InventoryPageState extends State<InventoryPage> {
                             borderRadius: BorderRadius.circular(8),
                             child: Image.network(
                               product.image,
-                              fit: BoxFit.contain,
+                              fit: BoxFit.cover,
                             ),
                           ),
                         ),
@@ -149,13 +142,13 @@ class _InventoryPageState extends State<InventoryPage> {
                   ),
                 );
               },
+              childCount: filteredProducts.length,
             ),
           ),
         ],
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
-          // Mostrar el modal y esperar el nuevo producto
           final newProduct = await showModalBottomSheet<Product>(
             context: context,
             isScrollControlled: true,
@@ -189,69 +182,6 @@ class _InventoryPageState extends State<InventoryPage> {
           Iconsax.add,
           color: Colors.white,
         ),
-      ),
-    );
-  }
-}
-
-class ProductDetailContent extends StatelessWidget {
-  final Product product;
-
-  const ProductDetailContent({super.key, required this.product});
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(32.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Text(
-            product.title,
-            style: const TextStyle(
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          const SizedBox(height: 4),
-          SizedBox(
-            width: double.infinity,
-            child: Image.network(
-              product.image,
-              height: 200,
-              fit: BoxFit.contain,
-            ),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            'Description',
-            style: TextStyle(
-              fontSize: 16,
-              color: Colors.grey[600],
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            product.description,
-            style: const TextStyle(fontSize: 16),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            'Price',
-            style: TextStyle(
-              fontSize: 16,
-              color: Colors.grey[600],
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            '\$${product.price}',
-            style: const TextStyle(fontSize: 16),
-          ),
-        ],
       ),
     );
   }

@@ -1,8 +1,8 @@
 import 'dart:convert';
-import 'package:cartunn/components/textfield.dart';
+import 'package:cartunn/presentation/widgets/textfield.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:cartunn/views/inventory/entity/product.dart';
+import 'package:cartunn/features/inventory/domain/entities/product.dart';
 
 class UploadItemPage extends StatefulWidget {
   const UploadItemPage({super.key});

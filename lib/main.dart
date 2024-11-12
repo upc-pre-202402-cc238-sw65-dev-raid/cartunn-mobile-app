@@ -1,9 +1,13 @@
+import 'package:cartunn/features/manageRefunds/data/datasources/manage_refund_remote_datasource.dart';
+import 'package:cartunn/features/manageRefunds/data/repository/manage_refund_repository_impl.dart';
+import 'package:cartunn/features/manageRefunds/domain/repository/manage_refund_repository.dart';
+import 'package:cartunn/features/manageRefunds/domain/usecases/get_products_refunds_usecase.dart';
+import 'package:cartunn/features/manageRefunds/presentation/pages/manage_refund_page.dart';
 import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:another_flutter_splash_screen/another_flutter_splash_screen.dart';
 import 'package:cartunn/views/orders/orders.dart';
 import 'package:cartunn/features/inventory/presentation/pages/inventory_page.dart';
-import 'package:cartunn/views/manageReturns/manage_returns.dart';
 import 'package:cartunn/views/editItem/edit_item.dart';
 import 'package:cartunn/views/settings/settings.dart';
 import 'package:get_it/get_it.dart';
@@ -23,6 +27,12 @@ void main() {
             remoteDatasource: getIt(),
           ));
   getIt.registerLazySingleton(() => GetProductsUseCase(repository: getIt()));
+
+  getIt.registerLazySingleton(() => ManageRefundRemoteDatasource());
+  getIt.registerLazySingleton<ManageRefundRepository>(() => ManageRefundRepositoryImpl(
+        remoteDatasource: getIt(),
+      ));
+  getIt.registerLazySingleton(() => GetProductsRefundsUseCase(repository: getIt()));
 
   runApp(const SplashScreen());
 }
@@ -92,9 +102,11 @@ class _BottomNavBarScreenState extends State<BottomNavBarScreen> {
       padding: EdgeInsets.fromLTRB(20, 10, 20, 0),
       child: OrdersPage(),
     ),
-    const Padding(
-      padding: EdgeInsets.symmetric(horizontal: 24),
-      child: ManageReturnsPage(),
+    Padding(
+      padding: const EdgeInsets.fromLTRB(20, 10, 20, 0),
+      child: ManageRefundView(
+        getProductsRefundsUseCase: GetIt.I<GetProductsRefundsUseCase>(),
+      ),
     ),
     const Padding(
       padding: EdgeInsets.symmetric(horizontal: 24),

@@ -13,7 +13,7 @@ class OrderRemoteDataSourceImpl implements OrderRemoteDataSource {
 
   @override
   Future<List<Order>> fetchOrders() async {
-    final response = await client.get(Uri.parse('https://cartunn.up.railway.app/api/v1/orders'));
+    final response = await client.get(Uri.parse('https://xddd.up.railway.app/api/v1/orders'));
 
     if (response.statusCode == 200) {
       final data = json.decode(response.body);

@@ -1,9 +1,20 @@
+import 'package:cartunn/features/settings/domain/usescases/get_profile_usecase.dart';
+import 'package:cartunn/features/settings/domain/usescases/update_profile_usecase.dart';
 import 'package:cartunn/features/settings/presentation/pages/help/help_center_page.dart';
-import 'package:cartunn/features/settings/presentation/pages/profile/profile.dart';
+import 'package:cartunn/features/settings/presentation/pages/profile/profile_page.dart';
 import 'package:flutter/material.dart';
 
 class SettingsPage extends StatelessWidget {
-  const SettingsPage({super.key});
+  final GetProfileUsecase getProfile;
+  final UpdateProfileUsecase updateProfile;
+  final int profileId;
+
+  const SettingsPage({
+    Key? key,
+    required this.getProfile,
+    required this.updateProfile,
+    required this.profileId,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -33,7 +44,13 @@ class SettingsPage extends StatelessWidget {
                   onTap: () {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => const ProfilePage()),
+                      MaterialPageRoute(
+                        builder: (context) => ProfilePage(
+                          getProfile: getProfile,
+                          updateProfile: updateProfile,
+                          profileId: profileId,
+                        ),
+                      ),
                     );
                   },
                   shape: RoundedRectangleBorder(
@@ -85,7 +102,7 @@ class SettingsPage extends StatelessWidget {
                   ),
                   trailing: const Icon(Icons.arrow_forward_ios, color: Colors.grey),
                   onTap: () {
-                    // Implement logout functionality here
+                    // Basura wiii
                   },
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12.0),

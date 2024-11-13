@@ -1,4 +1,6 @@
 import 'package:cartunn/features/manageRefunds/domain/usecases/get_products_refunds_usecase.dart';
+import 'package:cartunn/features/settings/domain/usescases/get_profile_usecase.dart';
+import 'package:cartunn/features/settings/domain/usescases/update_profile_usecase.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:iconsax/iconsax.dart';
@@ -27,7 +29,11 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return isAuthenticated
-        ? const BottomNavBarScreen()
+        ? BottomNavBarScreen(
+            getProfile: GetIt.I<GetProfileUsecase>(),
+            updateProfile: GetIt.I<UpdateProfileUsecase>(),
+            profileId: GetIt.I<int>(),
+          )
         : Scaffold(
             body: SafeArea(
               child: BlocConsumer<LoginBloc, LoginState>(
@@ -116,7 +122,16 @@ class _LoginPageState extends State<LoginPage> {
 }
 
 class BottomNavBarScreen extends StatefulWidget {
-  const BottomNavBarScreen({super.key});
+  final GetProfileUsecase getProfile;
+  final UpdateProfileUsecase updateProfile;
+  final int profileId;
+
+  const BottomNavBarScreen({
+    Key? key,
+    required this.getProfile,
+    required this.updateProfile,
+    required this.profileId,
+  }) : super(key: key);
 
   @override
   State<BottomNavBarScreen> createState() => _BottomNavBarScreenState();
@@ -125,7 +140,7 @@ class BottomNavBarScreen extends StatefulWidget {
 class _BottomNavBarScreenState extends State<BottomNavBarScreen> {
   int _selectedIndex = 0;
 
-  static final List<Widget> _pages = [
+  late final List<Widget> _pages = [
     Padding(
       padding: const EdgeInsets.all(8.0),
       child: InventoryView(
@@ -141,7 +156,11 @@ class _BottomNavBarScreenState extends State<BottomNavBarScreen> {
         getProductsRefundsUseCase: GetIt.I<GetProductsRefundsUseCase>(),
       ),
     ),
-    const SettingsPage(),
+    SettingsPage(
+      getProfile: widget.getProfile,
+      updateProfile: widget.updateProfile,
+      profileId: widget.profileId,
+    ),
   ];
 
   void _onItemTapped(int index) {

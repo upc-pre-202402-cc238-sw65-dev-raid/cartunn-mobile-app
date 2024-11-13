@@ -2,6 +2,10 @@ import 'package:cartunn/features/manageRefunds/data/datasources/manage_refund_re
 import 'package:cartunn/features/manageRefunds/data/repository/manage_refund_repository_impl.dart';
 import 'package:cartunn/features/manageRefunds/domain/repository/manage_refund_repository.dart';
 import 'package:cartunn/features/manageRefunds/domain/usecases/get_products_refunds_usecase.dart';
+import 'package:cartunn/features/settings/data/repositories/profile_repository_impl.dart';
+import 'package:cartunn/features/settings/domain/repositories/profile_repository.dart';
+import 'package:cartunn/features/settings/domain/usescases/get_profile_usecase.dart';
+import 'package:cartunn/features/settings/domain/usescases/update_profile_usecase.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:cartunn/features/auth/presentation/pages/login_page.dart';
@@ -35,6 +39,15 @@ void setupGetIt() {
   getIt.registerLazySingleton(
     () => GetProductsRefundsUseCase(repository: getIt()),
   );
+  getIt.registerLazySingleton<ProfileRepository>(() => ProfileRepositoryImpl(baseUrl: 'https://cartunn.up.railway.app/api/v1'));
+
+  getIt.registerLazySingleton<GetProfileUsecase>(() => GetProfileUsecase(getIt<ProfileRepository>()));
+  getIt.registerLazySingleton<UpdateProfileUsecase>(() => UpdateProfileUsecase(getIt<ProfileRepository>()));
+
+  // Registra el profileId si es un valor fijo, o asegúrate de configurarlo dinámicamente
+  //morì jijij
+  getIt.registerSingleton<int>(1); 
+
 }
 
 void main() {

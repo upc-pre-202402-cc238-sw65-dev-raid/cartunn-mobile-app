@@ -38,7 +38,6 @@ dependencies:
   http: ^0.13.3
   iconsax: ^0.0.8
   another_flutter_splash_screen: ^1.2.1
-  get_it: ^8.0.2
 
 dev_dependencies:
   flutter_test:

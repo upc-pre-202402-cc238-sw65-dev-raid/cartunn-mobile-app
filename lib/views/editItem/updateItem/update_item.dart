@@ -1,7 +1,7 @@
 import 'dart:convert';
 
 import 'package:cartunn/components/button.dart';
-import 'package:cartunn/presentation/widgets/textfield.dart';
+import 'package:cartunn/components/textfield.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
@@ -86,8 +86,7 @@ class UpdateItemPageState extends State<UpdateItemPage> {
               const SizedBox(height: 10),
               CustomTextField(controller: _nameController, label: 'Name'),
               const SizedBox(height: 10),
-              CustomTextField(
-                  controller: _descriptionController, label: 'Description'),
+              CustomTextField(controller: _descriptionController, label: 'Description'),
               const SizedBox(height: 10),
               CustomTextField(controller: _priceController, label: 'Price'),
               const SizedBox(height: 10),

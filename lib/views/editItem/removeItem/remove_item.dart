@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:cartunn/components/button.dart';
-import 'package:cartunn/presentation/widgets/textfield.dart';
+import 'package:cartunn/components/textfield.dart';
 
 class RemoveItemPage extends StatefulWidget {
   const RemoveItemPage({super.key});
@@ -64,14 +64,18 @@ class RemoveItemPageState extends State<RemoveItemPage> {
               const Text(
                 'Remove Item by ID',
                 style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black),
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black
+                ),
               ),
               const SizedBox(height: 8),
               const Text(
                 'Are you sure you want to delete this Item(this action es irreversible)?',
-                style: TextStyle(fontSize: 16, color: Colors.black),
+                style: TextStyle(
+                  fontSize: 16,
+                  color: Colors.black
+                ),
               ),
               const SizedBox(height: 20),
               CustomTextField(controller: _idController, label: 'Item ID'),

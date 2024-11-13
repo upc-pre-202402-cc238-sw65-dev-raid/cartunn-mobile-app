@@ -1,11 +1,11 @@
-import 'dart:convert';
+import 'package:cartunn/features/orders/domain/entities/order.dart';
+import 'package:cartunn/features/orders/domain/usecases/get_orders.dart';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
-import './entity/order.dart';
-import 'package:cartunn/components/draggable_sheet_component.dart';
 
 class OrdersPage extends StatefulWidget {
-  const OrdersPage({super.key});
+  final GetOrders getOrders;
+
+  const OrdersPage({super.key, required this.getOrders});
 
   @override
   _OrdersPageState createState() => _OrdersPageState();
@@ -26,17 +26,15 @@ class _OrdersPageState extends State<OrdersPage> {
   }
 
   Future<void> fetchOrders() async {
-    final response = await http
-        .get(Uri.parse('https://cartunn.up.railway.app/api/v1/orders'));
-
-    if (response.statusCode == 200) {
-      final data = json.decode(response.body);
+    try {
+      final fetchedOrders = await widget.getOrders();
       setState(() {
-        orders = List<Order>.from(data.map((x) => Order.fromJson(x)));
+        orders = fetchedOrders;
         filteredOrders = orders;
       });
-    } else {
-      throw Exception('Failed to load orders');
+    } catch (e) {
+      // Handle error accordingly
+      debugPrint('Failed to load orders: $e');
     }
   }
 
@@ -112,9 +110,7 @@ class _OrdersPageState extends State<OrdersPage> {
                           children: [
                             GestureDetector(
                               onTap: () {},
-                              child: DraggableSheetComponent(
-                                child: OrderDetailContent(order: order),
-                              ),
+                              child: OrderDetailContent(order: order),
                             ),
                           ],
                         ),

@@ -1,3 +1,7 @@
+import 'package:cartunn/features/manageRefunds/data/datasources/manage_refund_remote_datasource.dart';
+import 'package:cartunn/features/manageRefunds/data/repository/manage_refund_repository_impl.dart';
+import 'package:cartunn/features/manageRefunds/domain/repository/manage_refund_repository.dart';
+import 'package:cartunn/features/manageRefunds/domain/usecases/get_products_refunds_usecase.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:cartunn/features/auth/presentation/pages/login_page.dart';
@@ -22,6 +26,13 @@ void setupGetIt() {
   );
   getIt.registerLazySingleton(
     () => GetProductsUseCase(repository: getIt()),
+  );
+  getIt.registerLazySingleton(() => ManageRefundRemoteDatasource());
+  getIt.registerLazySingleton<ManageRefundRepository>(
+    () => ManageRefundRepositoryImpl(remoteDatasource: getIt()),
+  );
+  getIt.registerLazySingleton(
+    () => GetProductsRefundsUseCase(repository: getIt()),
   );
 }
 

@@ -1,3 +1,4 @@
+import 'package:cartunn/features/manageRefunds/domain/usecases/get_products_refunds_usecase.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:iconsax/iconsax.dart';
@@ -133,7 +134,13 @@ class _BottomNavBarScreenState extends State<BottomNavBarScreen> {
     ),
     const OrdersPage(),
     // const ManageRefundView(), -> Marianaaaaaa arregla en esta parte para que se llame de esta forma noma
-    const SettingsPage(),
+    //no
+    Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: ManageRefundView(
+        getProductsRefundsUseCase: GetIt.I<GetProductsRefundsUseCase>(),
+      ),
+    ),
     const SettingsPage(),
   ];
 

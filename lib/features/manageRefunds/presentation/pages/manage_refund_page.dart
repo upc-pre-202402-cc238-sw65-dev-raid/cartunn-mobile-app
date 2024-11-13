@@ -9,7 +9,8 @@ import 'package:cartunn/features/manageRefunds/presentation/widgets/manage_refun
 class ManageRefundView extends StatefulWidget {
   final GetProductsRefundsUseCase getProductsRefundsUseCase;
 
-  const ManageRefundView({super.key, required this.getProductsRefundsUseCase});
+  const ManageRefundView({Key? key, required this.getProductsRefundsUseCase})
+      : super(key: key);
 
   @override
   ManageRefundViewState createState() => ManageRefundViewState();

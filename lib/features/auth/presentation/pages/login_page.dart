@@ -9,7 +9,7 @@ import 'package:get_it/get_it.dart';
 import 'package:cartunn/features/inventory/presentation/pages/inventory_page.dart';
 import 'package:cartunn/features/manageRefunds/presentation/pages/manage_refund_page.dart';
 import 'package:cartunn/views/orders/orders.dart';
-import 'package:cartunn/views/settings/settings.dart';
+import 'package:cartunn/features/settings/presentation/pages/settings_page.dart';
 import 'package:cartunn/features/inventory/domain/usecases/get_products_usecase.dart';
 
 class LoginPage extends StatefulWidget {

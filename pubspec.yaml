@@ -37,6 +37,8 @@ dependencies:
   cupertino_icons: ^1.0.8
   http: ^0.13.3
   iconsax: ^0.0.8
+  accordion: ^2.0.6
+
   another_flutter_splash_screen: ^1.2.1
   get_it: ^8.0.2
   flutter_bloc: ^8.1.6

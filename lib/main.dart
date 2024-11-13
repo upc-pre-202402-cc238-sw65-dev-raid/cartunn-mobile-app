@@ -20,6 +20,7 @@ void setupGetIt() {
   getIt.registerLazySingleton(() => http.Client());
   getIt.registerLazySingleton(() => AuthService());
   getIt.registerFactory(() => LoginBloc(getIt<AuthService>()));
+  
   getIt.registerLazySingleton(() => InventoryRemoteDatasource());
   getIt.registerLazySingleton<InventoryRepository>(
     () => InventoryRepositoryImpl(remoteDatasource: getIt()),

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cartunn/components/button.dart';
-import 'package:cartunn/presentation/widgets/textfield.dart';
+import 'package:cartunn/shared/presentation/widgets/textfield.dart';
 
 class ProfilePage extends StatelessWidget {
   const ProfilePage({super.key});

@@ -1,186 +1,52 @@
-import 'package:cartunn/features/manageRefunds/data/datasources/manage_refund_remote_datasource.dart';
-import 'package:cartunn/features/manageRefunds/data/repository/manage_refund_repository_impl.dart';
-import 'package:cartunn/features/manageRefunds/domain/repository/manage_refund_repository.dart';
-import 'package:cartunn/features/manageRefunds/domain/usecases/get_products_refunds_usecase.dart';
-import 'package:cartunn/features/manageRefunds/presentation/pages/manage_refund_page.dart';
 import 'package:flutter/material.dart';
-import 'package:iconsax/iconsax.dart';
-import 'package:another_flutter_splash_screen/another_flutter_splash_screen.dart';
-import 'package:cartunn/views/orders/orders.dart';
-import 'package:cartunn/features/inventory/presentation/pages/inventory_page.dart';
-import 'package:cartunn/views/editItem/edit_item.dart';
-import 'package:cartunn/views/settings/settings.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:cartunn/features/auth/presentation/pages/login_page.dart';
 import 'package:get_it/get_it.dart';
 import 'package:http/http.dart' as http;
 import 'package:cartunn/features/inventory/data/datasources/inventory_remote_datasource.dart';
 import 'package:cartunn/features/inventory/data/repositories/inventory_repository_impl.dart';
 import 'package:cartunn/features/inventory/domain/repositories/inventory_repository.dart';
 import 'package:cartunn/features/inventory/domain/usecases/get_products_usecase.dart';
+import 'package:cartunn/features/auth/data/remote/auth_service.dart';
+import 'package:cartunn/features/auth/presentation/blocs/login_bloc.dart';
+
+final getIt = GetIt.instance;
+
+void setupGetIt() {
+  getIt.registerLazySingleton(() => http.Client());
+  getIt.registerLazySingleton(() => AuthService());
+  getIt.registerFactory(() => LoginBloc(getIt<AuthService>()));
+  getIt.registerLazySingleton(() => InventoryRemoteDatasource());
+  getIt.registerLazySingleton<InventoryRepository>(
+    () => InventoryRepositoryImpl(remoteDatasource: getIt()),
+  );
+  getIt.registerLazySingleton(
+    () => GetProductsUseCase(repository: getIt()),
+  );
+}
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
-  final getIt = GetIt.instance;
-  getIt.registerLazySingleton(() => http.Client());
-  getIt.registerLazySingleton(() => InventoryRemoteDatasource());
-  getIt
-      .registerLazySingleton<InventoryRepository>(() => InventoryRepositoryImpl(
-            remoteDatasource: getIt(),
-          ));
-  getIt.registerLazySingleton(() => GetProductsUseCase(repository: getIt()));
-
-  getIt.registerLazySingleton(() => ManageRefundRemoteDatasource());
-  getIt.registerLazySingleton<ManageRefundRepository>(() => ManageRefundRepositoryImpl(
-        remoteDatasource: getIt(),
-      ));
-  getIt.registerLazySingleton(() => GetProductsRefundsUseCase(repository: getIt()));
-
-  runApp(const SplashScreen());
+  setupGetIt();
+  runApp(const MyApp());
 }
 
-class SplashScreen extends StatelessWidget {
-  const SplashScreen({super.key});
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'Cartunn Mobile App',
-      theme: ThemeData(
-        fontFamily: 'Poppins',
-      ),
-      home: FlutterSplashScreen.scale(
-        gradient: const LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          colors: [Color(0xFF5766f5), Color(0xFF5766f5)],
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider<LoginBloc>(
+          create: (context) => getIt<LoginBloc>(),
         ),
-        childWidget: SizedBox(
-          height: 45,
-          child: Image.asset('assets/images/cartunn-logo.png'),
-        ),
-        duration: const Duration(milliseconds: 3000),
-        animationDuration: const Duration(milliseconds: 500),
-        onAnimationEnd: () => debugPrint("On Scale End"),
-        nextScreen: const BottomNavBarApp(),
-      ),
-    );
-  }
-}
-
-class BottomNavBarApp extends StatelessWidget {
-  const BottomNavBarApp({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'Cartunn Mobile App',
-      theme: Theme.of(context),
-      home: const BottomNavBarScreen(),
-    );
-  }
-}
-
-class BottomNavBarScreen extends StatefulWidget {
-  const BottomNavBarScreen({super.key});
-
-  @override
-  State<BottomNavBarScreen> createState() => _BottomNavBarScreenState();
-}
-
-class _BottomNavBarScreenState extends State<BottomNavBarScreen> {
-  int _selectedIndex = 0;
-
-  static final List<Widget> _pages = [
-    Padding(
-      padding: const EdgeInsets.fromLTRB(20, 10, 20, 0),
-      child: InventoryView(
-        getProductsUseCase: GetIt.I<GetProductsUseCase>(),
-      ),
-    ),
-    const Padding(
-      padding: EdgeInsets.fromLTRB(20, 10, 20, 0),
-      child: OrdersPage(),
-    ),
-    Padding(
-      padding: const EdgeInsets.fromLTRB(20, 10, 20, 0),
-      child: ManageRefundView(
-        getProductsRefundsUseCase: GetIt.I<GetProductsRefundsUseCase>(),
-      ),
-    ),
-    const Padding(
-      padding: EdgeInsets.symmetric(horizontal: 24),
-      child: EditItemPage(),
-    ),
-    const Padding(
-      padding: EdgeInsets.symmetric(horizontal: 24),
-      child: SettingsPage(),
-    ),
-  ];
-
-  void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: _pages[_selectedIndex],
-      bottomNavigationBar: BottomNavigationBar(
-        items: [
-          BottomNavigationBarItem(
-            icon: Icon(
-              _selectedIndex == 0 ? Iconsax.note4 : Iconsax.note4,
-              color: _selectedIndex == 0
-                  ? const Color(0xFF5766f5)
-                  : Colors.black38,
-            ),
-            label: 'Inventory',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(
-              _selectedIndex == 1 ? Iconsax.task_square : Iconsax.task_square,
-              color: _selectedIndex == 1
-                  ? const Color(0xFF5766f5)
-                  : Colors.black38,
-            ),
-            label: 'Orders',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(
-              _selectedIndex == 2 ? Iconsax.book_square : Iconsax.book_square,
-              color: _selectedIndex == 2
-                  ? const Color(0xFF5766f5)
-                  : Colors.black38,
-            ),
-            label: 'Manage returns',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(
-              _selectedIndex == 3 ? Iconsax.edit : Iconsax.edit,
-              color: _selectedIndex == 3
-                  ? const Color(0xFF5766f5)
-                  : Colors.black38,
-            ),
-            label: 'Edit Item',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(
-              _selectedIndex == 4 ? Iconsax.setting_3 : Iconsax.setting_3,
-              color: _selectedIndex == 4
-                  ? const Color(0xFF5766f5)
-                  : Colors.black38,
-            ),
-            label: 'Settings',
-          ),
-        ],
-        currentIndex: _selectedIndex,
-        selectedItemColor: const Color(0xFF5766f5),
-        unselectedItemColor: Colors.black38,
-        showUnselectedLabels: true,
-        onTap: _onItemTapped,
+      ],
+      child: MaterialApp(
+        debugShowCheckedModeBanner: false,
+        title: 'Cartunn Mobile App',
+        theme: ThemeData(fontFamily: 'Poppins'),
+        home: const LoginPage(),
       ),
     );
   }

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cartunn/features/inventory/domain/entities/product.dart';
-import 'package:cartunn/presentation/widgets/textfield.dart';
+import 'package:cartunn/shared/presentation/widgets/textfield.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 

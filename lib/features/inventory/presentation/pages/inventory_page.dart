@@ -5,7 +5,7 @@ import 'package:cartunn/components/draggable_sheet_component.dart';
 import 'package:cartunn/features/inventory/domain/entities/product.dart';
 import 'package:cartunn/features/inventory/domain/usecases/get_products_usecase.dart';
 import 'package:cartunn/features/inventory/presentation/widgets/product_detail_content.dart';
-import 'package:cartunn/presentation/widgets/search_input.dart';
+import 'package:cartunn/shared/presentation/widgets/search_input.dart';
 
 class InventoryView extends StatefulWidget {
   final GetProductsUseCase getProductsUseCase;

@@ -1,4 +1,6 @@
 import 'package:cartunn/features/manageRefunds/domain/usecases/get_products_refunds_usecase.dart';
+import 'package:cartunn/features/orders/domain/usecases/get_orders.dart';
+import 'package:cartunn/features/orders/presentation/orders_page.dart';
 import 'package:cartunn/features/settings/domain/usescases/get_profile_usecase.dart';
 import 'package:cartunn/features/settings/domain/usescases/update_profile_usecase.dart';
 import 'package:flutter/material.dart';
@@ -10,7 +12,6 @@ import 'package:cartunn/features/auth/presentation/blocs/login_state.dart';
 import 'package:get_it/get_it.dart';
 import 'package:cartunn/features/inventory/presentation/pages/inventory_page.dart';
 import 'package:cartunn/features/manageRefunds/presentation/pages/manage_refund_page.dart';
-import 'package:cartunn/views/orders/orders.dart';
 import 'package:cartunn/features/settings/presentation/pages/settings_page.dart';
 import 'package:cartunn/features/inventory/domain/usecases/get_products_usecase.dart';
 
@@ -147,7 +148,9 @@ class _BottomNavBarScreenState extends State<BottomNavBarScreen> {
         getProductsUseCase: GetIt.I<GetProductsUseCase>(),
       ),
     ),
-    const OrdersPage(),
+     OrdersPage(
+  getOrders: GetIt.I<GetOrders>(),
+),
     // const ManageRefundView(), -> Marianaaaaaa arregla en esta parte para que se llame de esta forma noma
     //no
     Padding(

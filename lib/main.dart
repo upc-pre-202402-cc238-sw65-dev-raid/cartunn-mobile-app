@@ -36,7 +36,7 @@ void setupGetIt() {
     () => GetProductsUseCase(repository: getIt()),
   );
   //Orders
-  getIt.registerLazySingleton(() => OrderRemoteDataSource());
+  getIt.registerLazySingleton(() => OrderRemoteDataSource(getIt<AuthService>()));
   getIt.registerLazySingleton<OrderRepository>(
     () => OrderRepositoryImpl(remoteDataSource: getIt()),
   );

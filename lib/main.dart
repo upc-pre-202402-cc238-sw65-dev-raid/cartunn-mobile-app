@@ -2,10 +2,10 @@ import 'package:cartunn/features/manageRefunds/data/datasources/manage_refund_re
 import 'package:cartunn/features/manageRefunds/data/repository/manage_refund_repository_impl.dart';
 import 'package:cartunn/features/manageRefunds/domain/repository/manage_refund_repository.dart';
 import 'package:cartunn/features/manageRefunds/domain/usecases/get_products_refunds_usecase.dart';
-import 'package:cartunn/features/settings/data/repositories/profile_repository_impl.dart';
-import 'package:cartunn/features/settings/domain/repositories/profile_repository.dart';
-import 'package:cartunn/features/settings/domain/usescases/get_profile_usecase.dart';
-import 'package:cartunn/features/settings/domain/usescases/update_profile_usecase.dart';
+import 'package:cartunn/features/orders/data/datasources/order_remote_data_source.dart';
+import 'package:cartunn/features/orders/data/repositories/order_repository_impl.dart';
+import 'package:cartunn/features/orders/domain/repositories/order_repository.dart';
+import 'package:cartunn/features/orders/domain/usecases/get_orders_usecase.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:cartunn/features/auth/presentation/pages/login_page.dart';
@@ -22,31 +22,38 @@ final getIt = GetIt.instance;
 
 void setupGetIt() {
   getIt.registerLazySingleton(() => http.Client());
+
   getIt.registerLazySingleton(() => AuthService());
   getIt.registerFactory(() => LoginBloc(getIt<AuthService>()));
-  
-  getIt.registerLazySingleton(() => InventoryRemoteDatasource());
+  //inventory
+  getIt.registerLazySingleton<InventoryRemoteDatasource>(
+    () => InventoryRemoteDatasource(getIt<AuthService>()),
+  );
   getIt.registerLazySingleton<InventoryRepository>(
     () => InventoryRepositoryImpl(remoteDatasource: getIt()),
   );
   getIt.registerLazySingleton(
     () => GetProductsUseCase(repository: getIt()),
   );
-  getIt.registerLazySingleton(() => ManageRefundRemoteDatasource());
+  //Orders
+  getIt.registerLazySingleton(() => OrderRemoteDataSource());
+  getIt.registerLazySingleton<OrderRepository>(
+    () => OrderRepositoryImpl(remoteDataSource: getIt()),
+  );
+   getIt.registerLazySingleton(
+    () => GetOrdersUsecase(repository: getIt()),
+  );
+
+  //Manage Refunds
+  getIt.registerLazySingleton<ManageRefundRemoteDatasource>(
+    () => ManageRefundRemoteDatasource(getIt<AuthService>()), // Inyecta AuthService
+  );
   getIt.registerLazySingleton<ManageRefundRepository>(
     () => ManageRefundRepositoryImpl(remoteDatasource: getIt()),
   );
   getIt.registerLazySingleton(
     () => GetProductsRefundsUseCase(repository: getIt()),
   );
-  getIt.registerLazySingleton<ProfileRepository>(() => ProfileRepositoryImpl(baseUrl: 'https://cartunn.up.railway.app/api/v1'));
-
-  getIt.registerLazySingleton<GetProfileUsecase>(() => GetProfileUsecase(getIt<ProfileRepository>()));
-  getIt.registerLazySingleton<UpdateProfileUsecase>(() => UpdateProfileUsecase(getIt<ProfileRepository>()));
-
-  // Registra el profileId si es un valor fijo, o asegúrate de configurarlo dinámicamente
-  //morì jijij
-  getIt.registerSingleton<int>(1); 
 
 }
 

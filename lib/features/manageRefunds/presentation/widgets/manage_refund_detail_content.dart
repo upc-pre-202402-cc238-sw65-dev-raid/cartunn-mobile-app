@@ -1,6 +1,6 @@
-import 'package:flutter/material.dart';
 import 'package:cartunn/components/button.dart';
 import 'package:cartunn/features/manageRefunds/domain/entity/product_refund.dart';
+import 'package:flutter/material.dart';
 
 class ProductRefundDetailContent extends StatefulWidget {
   final ProductRefund productRefund;
@@ -13,10 +13,9 @@ class ProductRefundDetailContent extends StatefulWidget {
   });
 
   @override
-  _ProductRefundDetailContentState createState() =>
+  State<ProductRefundDetailContent> createState() =>
       _ProductRefundDetailContentState();
 }
-
 
 class _ProductRefundDetailContentState extends State<ProductRefundDetailContent> {
   late String _selectedStatus;
@@ -53,7 +52,7 @@ class _ProductRefundDetailContentState extends State<ProductRefundDetailContent>
           const SizedBox(height: 4),
           Text(
             widget.productRefund.description,
-            style: const TextStyle(fontSize: 16),
+            style: const TextStyle(fontSize: 18),
           ),
           const SizedBox(height: 16),
           Text(
@@ -64,28 +63,18 @@ class _ProductRefundDetailContentState extends State<ProductRefundDetailContent>
               fontWeight: FontWeight.bold,
             ),
           ),
-          const SizedBox(height: 4),
           DropdownButton<String>(
             value: _selectedStatus,
-            items: const [
-              DropdownMenuItem(
-                value: 'Rejected',
-                child: Text('Rejected'),
-              ),
-              DropdownMenuItem(
-                value: 'Processing',
-                child: Text('Processing'),
-              ),
-              DropdownMenuItem(
-                value: 'Processed',
-                child: Text('Processed'),
-              ),
-            ],
             onChanged: (value) {
               setState(() {
                 _selectedStatus = value!;
               });
             },
+            items: const [
+              DropdownMenuItem(value: 'Processed', child: Text('Processed')),
+              DropdownMenuItem(value: 'Processing', child: Text('Processing')),
+              DropdownMenuItem(value: 'Rejected', child: Text('Rejected')),
+            ],
           ),
           const SizedBox(height: 32),
           Row(

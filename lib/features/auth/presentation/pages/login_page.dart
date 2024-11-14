@@ -1,8 +1,6 @@
 import 'package:cartunn/features/manageRefunds/domain/usecases/get_products_refunds_usecase.dart';
-import 'package:cartunn/features/orders/domain/usecases/get_orders.dart';
+import 'package:cartunn/features/orders/domain/usecases/get_orders_usecase.dart';
 import 'package:cartunn/features/orders/presentation/orders_page.dart';
-import 'package:cartunn/features/settings/domain/usescases/get_profile_usecase.dart';
-import 'package:cartunn/features/settings/domain/usescases/update_profile_usecase.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:iconsax/iconsax.dart';
@@ -30,11 +28,7 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return isAuthenticated
-        ? BottomNavBarScreen(
-            getProfile: GetIt.I<GetProfileUsecase>(),
-            updateProfile: GetIt.I<UpdateProfileUsecase>(),
-            profileId: GetIt.I<int>(),
-          )
+        ? const BottomNavBarScreen()
         : Scaffold(
             body: SafeArea(
               child: BlocConsumer<LoginBloc, LoginState>(
@@ -123,15 +117,9 @@ class _LoginPageState extends State<LoginPage> {
 }
 
 class BottomNavBarScreen extends StatefulWidget {
-  final GetProfileUsecase getProfile;
-  final UpdateProfileUsecase updateProfile;
-  final int profileId;
 
   const BottomNavBarScreen({
     Key? key,
-    required this.getProfile,
-    required this.updateProfile,
-    required this.profileId,
   }) : super(key: key);
 
   @override
@@ -148,22 +136,22 @@ class _BottomNavBarScreenState extends State<BottomNavBarScreen> {
         getProductsUseCase: GetIt.I<GetProductsUseCase>(),
       ),
     ),
-     OrdersPage(
-  getOrders: GetIt.I<GetOrders>(),
-),
-    // const ManageRefundView(), -> Marianaaaaaa arregla en esta parte para que se llame de esta forma noma
-    //no
+    Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: OrdersPage(
+        getOrdersUsecase: GetIt.I<GetOrdersUsecase>(),
+      ),
+    ),
     Padding(
       padding: const EdgeInsets.all(8.0),
       child: ManageRefundView(
         getProductsRefundsUseCase: GetIt.I<GetProductsRefundsUseCase>(),
       ),
     ),
-    SettingsPage(
-      getProfile: widget.getProfile,
-      updateProfile: widget.updateProfile,
-      profileId: widget.profileId,
-    ),
+    const Padding(
+      padding: EdgeInsets.all(8.0),
+      child: SettingsPage(),
+     )
   ];
 
   void _onItemTapped(int index) {

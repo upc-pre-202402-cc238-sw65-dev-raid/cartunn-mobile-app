@@ -1,12 +1,12 @@
 import 'package:cartunn/features/orders/domain/entities/order.dart';
 import 'package:cartunn/features/orders/domain/repositories/order_repository.dart';
 
-class GetOrders {
+class GetOrdersUsecase {
   final OrderRepository repository;
 
-  GetOrders(this.repository);
+  GetOrdersUsecase({required this.repository});
 
   Future<List<Order>> call() async {
-    return await repository.fetchOrders();
+    return await repository.getOrders();
   }
 }

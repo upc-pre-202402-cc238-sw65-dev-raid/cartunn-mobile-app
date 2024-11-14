@@ -1,9 +1,11 @@
 import 'dart:convert';
+import 'package:cartunn/features/auth/data/remote/auth_service.dart';
 import 'package:cartunn/features/manageRefunds/domain/entity/product_refund.dart';
+import 'package:cartunn/features/manageRefunds/domain/usecases/get_products_refunds_usecase.dart';
 import 'package:flutter/material.dart';
+import 'package:get_it/get_it.dart';
 import 'package:http/http.dart' as http;
 import 'package:cartunn/components/draggable_sheet_component.dart';
-import 'package:cartunn/features/manageRefunds/domain/usecases/get_products_refunds_usecase.dart';
 import 'package:cartunn/features/manageRefunds/presentation/widgets/manage_refund_detail_content.dart';
 
 class ManageRefundView extends StatefulWidget {
@@ -15,9 +17,10 @@ class ManageRefundView extends StatefulWidget {
   @override
   ManageRefundViewState createState() => ManageRefundViewState();
 }
+
 class ManageRefundViewState extends State<ManageRefundView> {
   List<ProductRefund> refunds = [];
-
+  final authService = GetIt.I<AuthService>();
   @override
   void initState() {
     super.initState();
@@ -42,11 +45,22 @@ class ManageRefundViewState extends State<ManageRefundView> {
   }
 
   Future<void> _updateRefundStatus(ProductRefund refund, String newStatus) async {
+    final token = authService.token;
+    if (token == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('No autorizado. Inicia sesión primero.')),
+      );
+      return;
+    }
+    
     final url = Uri.parse(
         'https://cartunn.up.railway.app/api/v1/product-refund/${refund.id}');
     final response = await http.put(
       url,
-      headers: {'Content-Type': 'application/json'},
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer $token",
+      },
       body: json.encode({
         'id': refund.id,
         'title': refund.title,
@@ -116,7 +130,7 @@ class ManageRefundViewState extends State<ManageRefundView> {
             fontSize: 30,
             fontWeight: FontWeight.bold,
           ),
-          ),
+        ),
       ),
       body: Padding(
         padding: const EdgeInsets.all(8.0),
@@ -130,13 +144,25 @@ class ManageRefundViewState extends State<ManageRefundView> {
                   context: context,
                   isScrollControlled: true,
                   backgroundColor: Colors.transparent,
-                  builder: (context) => DraggableSheetComponent(
-                    child: ProductRefundDetailContent(
-                      productRefund: productRefund,
-                      onSave: (newStatus) {
-                        _updateRefundStatus(productRefund, newStatus);
-                        Navigator.of(context).pop();
-                      },
+                  builder: (context) => GestureDetector(
+                    behavior: HitTestBehavior.opaque,
+                    onTap: () {
+                      Navigator.of(context).pop();
+                    },
+                    child: Stack(
+                      children: [
+                        GestureDetector(
+                          onTap: () {},
+                          child: DraggableSheetComponent(
+                            child: ProductRefundDetailContent(
+                              productRefund: productRefund,
+                              onSave: (newStatus) {
+                                _updateRefundStatus(productRefund, newStatus);
+                              },
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 );

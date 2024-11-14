@@ -1,17 +1,18 @@
 import 'package:cartunn/features/orders/domain/entities/order.dart';
-import 'package:cartunn/features/orders/domain/usecases/get_orders.dart';
+import 'package:cartunn/features/orders/domain/usecases/get_orders_usecase.dart';
 import 'package:flutter/material.dart';
 
 class OrdersPage extends StatefulWidget {
-  final GetOrders getOrders;
+  final GetOrdersUsecase getOrdersUsecase;
 
-  const OrdersPage({super.key, required this.getOrders});
+  const OrdersPage({Key? key, required this.getOrdersUsecase})
+      : super(key: key);
 
   @override
-  _OrdersPageState createState() => _OrdersPageState();
+  OrdersPageState createState() => OrdersPageState();
 }
 
-class _OrdersPageState extends State<OrdersPage> {
+class OrdersPageState extends State<OrdersPage> {
   List<Order> orders = [];
   List<Order> filteredOrders = [];
   TextEditingController searchController = TextEditingController();
@@ -27,7 +28,7 @@ class _OrdersPageState extends State<OrdersPage> {
 
   Future<void> fetchOrders() async {
     try {
-      final fetchedOrders = await widget.getOrders();
+      final fetchedOrders = await widget.getOrdersUsecase.call();
       setState(() {
         orders = fetchedOrders;
         filteredOrders = orders;
@@ -118,6 +119,7 @@ class _OrdersPageState extends State<OrdersPage> {
                     );
                   },
                   child: Card(
+                    elevation: 4,
                     child: Column(
                       children: [
                         Expanded(

@@ -1,10 +1,10 @@
 import 'package:cartunn/features/settings/presentation/pages/help/help_center_page.dart';
+import 'package:cartunn/features/auth/presentation/pages/login_page.dart';
 import 'package:flutter/material.dart';
 
 class SettingsPage extends StatelessWidget {
-  const SettingsPage({
-    Key? key,
-  }) : super(key: key);
+  const SettingsPage({ Key? key,
+}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -58,8 +58,16 @@ class SettingsPage extends StatelessWidget {
                     style: TextStyle(color: Colors.black),
                   ),
                   trailing: const Icon(Icons.arrow_forward_ios, color: Colors.grey),
-                  onTap: () {
-                    // Basura wiii
+                  onTap: () async {
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(builder: (context) => const LoginPage()),
+                    );
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text("Logout successfully"),
+                      ),
+                    );
                   },
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12.0),

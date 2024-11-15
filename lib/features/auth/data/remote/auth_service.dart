@@ -26,4 +26,8 @@ class AuthService {
   }
 
   String? get token => _token;
+
+  Future<void> logout() async {
+    _token = null;
+  }
 }

@@ -13,17 +13,18 @@ class OrderModel extends Order{
   });
 
   factory OrderModel.fromJson(Map<String, dynamic> json) {
-    return OrderModel(
-      id: json['id'],
-      name: json['name'],
-      description: json['description'],
-      code: json['code'],
-      entryDate: json['entryDate'],
-      exitDate: json['exitDate'],
-      status: json['status'],
-      imageUrl: json['imageUrl'],
-    );
-  }
+  return OrderModel(
+    id: json['id'] ?? 0, // Suponiendo que 'id' es un entero, asigna un valor predeterminado como 0
+    name: json['name'] ?? 'N/A', // Valor predeterminado si 'name' es null
+    description: json['description'] ?? 'No description', // Valor predeterminado para 'description'
+    code: json['code'] ?? 'No code', // Valor predeterminado para 'code'
+    entryDate: json['entryDate'] ?? '', // Valor predeterminado para 'entryDate'
+    exitDate: json['exitDate'] ?? '', // Valor predeterminado para 'exitDate'
+    status: json['status'] ?? 'unknown', // Valor predeterminado para 'status'
+    imageUrl: json['imageUrl'] ?? '', // Valor predeterminado para 'imageUrl'
+  );
+}
+
 
   Order toEntity() {
     return Order(

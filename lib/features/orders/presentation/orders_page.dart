@@ -1,12 +1,16 @@
+import 'package:cartunn/features/orders/presentation/widgets/order_detail_content.dart';
+import 'package:flutter/material.dart';
+import 'package:iconsax/iconsax.dart';
 import 'package:cartunn/features/orders/domain/entities/order.dart';
 import 'package:cartunn/features/orders/domain/usecases/get_orders_usecase.dart';
-import 'package:flutter/material.dart';
+import 'package:cartunn/shared/presentation/widgets/search_input.dart'; 
+import 'package:cartunn/components/draggable_sheet_component.dart';
+ 
 
 class OrdersPage extends StatefulWidget {
   final GetOrdersUsecase getOrdersUsecase;
 
-  const OrdersPage({Key? key, required this.getOrdersUsecase})
-      : super(key: key);
+  const OrdersPage({Key? key, required this.getOrdersUsecase}) : super(key: key);
 
   @override
   OrdersPageState createState() => OrdersPageState();
@@ -27,16 +31,11 @@ class OrdersPageState extends State<OrdersPage> {
   }
 
   Future<void> fetchOrders() async {
-    try {
-      final fetchedOrders = await widget.getOrdersUsecase.call();
-      setState(() {
-        orders = fetchedOrders;
-        filteredOrders = orders;
-      });
-    } catch (e) {
-      // Handle error accordingly
-      debugPrint('Failed to load orders: $e');
-    }
+    final fetchedOrders = await widget.getOrdersUsecase.call();
+    setState(() {
+      orders = fetchedOrders;
+      filteredOrders = orders.reversed.toList();
+    });
   }
 
   void filterOrders() {
@@ -57,45 +56,41 @@ class OrdersPageState extends State<OrdersPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: ListView(
-        children: [
-          const Padding(
-            padding: EdgeInsets.all(8.0),
-            child: Text(
-              'Orders',
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 30,
-              ),
-            ),
+      appBar: AppBar(
+        title: const Text(
+          'Orders',
+          style: TextStyle(
+            fontSize: 30,
+            fontWeight: FontWeight.bold,
           ),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: TextField(
+        ),
+      ),
+      body: CustomScrollView(
+        slivers: [
+          SliverAppBar(
+            title: SearchInput(
               controller: searchController,
-              decoration: InputDecoration(
-                hintText: 'Search by name...',
-                prefixIcon: const Icon(Icons.search),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-              ),
+              hintText: "Search orders...",
+              onChanged: (value) {
+                filterOrders();
+              },
             ),
+            floating: true,
+            pinned: true,
+            titleSpacing: 0,
+            toolbarHeight: 80,
+            leadingWidth: 8,
           ),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: GridView.builder(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              itemCount: filteredOrders.length,
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
-                crossAxisSpacing: 10,
-                mainAxisSpacing: 10,
-                childAspectRatio: 0.75,
-              ),
-              itemBuilder: (context, index) {
-                final order = filteredOrders.reversed.toList()[index];
+          SliverGrid(
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 2,
+              crossAxisSpacing: 8,
+              mainAxisSpacing: 8,
+              childAspectRatio: 0.75,
+            ),
+            delegate: SliverChildBuilderDelegate(
+              (context, index) {
+                final order = filteredOrders[index];
                 return GestureDetector(
                   onTap: () {
                     showModalBottomSheet(
@@ -111,7 +106,9 @@ class OrdersPageState extends State<OrdersPage> {
                           children: [
                             GestureDetector(
                               onTap: () {},
-                              child: OrderDetailContent(order: order),
+                              child: DraggableSheetComponent(
+                                child: OrderDetailContent(order: order),
+                              ),
                             ),
                           ],
                         ),
@@ -121,13 +118,14 @@ class OrdersPageState extends State<OrdersPage> {
                   child: Card(
                     elevation: 4,
                     child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
                         Expanded(
                           child: ClipRRect(
                             borderRadius: BorderRadius.circular(8),
                             child: Image.network(
                               order.imageUrl,
-                              fit: BoxFit.contain,
+                              fit: BoxFit.cover,
                             ),
                           ),
                         ),
@@ -135,10 +133,7 @@ class OrdersPageState extends State<OrdersPage> {
                           padding: const EdgeInsets.all(8.0),
                           child: Text(
                             order.name,
-                            style: const TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                            ),
+                            style: const TextStyle(fontWeight: FontWeight.bold),
                             textAlign: TextAlign.center,
                           ),
                         ),
@@ -147,120 +142,20 @@ class OrdersPageState extends State<OrdersPage> {
                   ),
                 );
               },
+              childCount: filteredOrders.length,
             ),
           ),
         ],
       ),
-    );
-  }
-}
-
-class OrderDetailContent extends StatelessWidget {
-  final Order order;
-
-  const OrderDetailContent({super.key, required this.order});
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(32.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            order.name,
-            style: const TextStyle(
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          const SizedBox(height: 4),
-          SizedBox(
-            width: double.infinity,
-            child: Image.network(
-              order.imageUrl,
-              height: 200,
-              fit: BoxFit.contain,
-            ),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            'Description',
-            style: TextStyle(
-              fontSize: 16,
-              color: Colors.grey[600],
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            order.description,
-            style: const TextStyle(fontSize: 16),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            'Entry',
-            style: TextStyle(
-              fontSize: 16,
-              color: Colors.grey[600],
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            order.entryDate,
-            style: const TextStyle(fontSize: 16),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            'Exit',
-            style: TextStyle(
-              fontSize: 16,
-              color: Colors.grey[600],
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            order.exitDate,
-            style: const TextStyle(fontSize: 16),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            'State',
-            style: TextStyle(
-              fontSize: 16,
-              color: Colors.grey[600],
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          const SizedBox(height: 4),
-          Row(
-            children: [
-              Icon(
-                order.status == 'completed'
-                    ? Icons.check_circle
-                    : order.status == 'in_process'
-                        ? Icons.hourglass_top
-                        : Icons.cancel,
-                color: order.status == 'completed'
-                    ? Colors.green
-                    : order.status == 'in_process'
-                        ? Colors.orange
-                        : Colors.red,
-              ),
-              const SizedBox(width: 8),
-              Text(
-                order.status == 'completed'
-                    ? 'Finished'
-                    : order.status == 'in_process'
-                        ? 'In progress'
-                        : 'Cancelled',
-                style: const TextStyle(fontSize: 16),
-              ),
-            ],
-          ),
-        ],
+      floatingActionButton: FloatingActionButton(
+        onPressed: () async {
+          // Implementa aquí la funcionalidad para agregar una nueva orden
+        },
+        backgroundColor: const Color(0xFF5766f5),
+        child: const Icon(
+          Iconsax.add,
+          color: Colors.white,
+        ),
       ),
     );
   }

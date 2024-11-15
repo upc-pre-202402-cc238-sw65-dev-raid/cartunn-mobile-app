@@ -57,6 +57,24 @@ void setupGetIt() {
 
 }
 
+void initializeAfterLogin() {
+  if (!getIt.isRegistered<OrderRemoteDataSource>()) {
+    getIt.registerLazySingleton(() => OrderRemoteDataSource(getIt<AuthService>()));
+  }
+
+  if (!getIt.isRegistered<OrderRepository>()) {
+    getIt.registerLazySingleton<OrderRepository>(
+      () => OrderRepositoryImpl(remoteDataSource: getIt()),
+    );
+  }
+
+  if (!getIt.isRegistered<GetOrdersUsecase>()) {
+    getIt.registerLazySingleton(() => GetOrdersUsecase(repository: getIt()));
+  }
+}
+
+
+
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
   setupGetIt();

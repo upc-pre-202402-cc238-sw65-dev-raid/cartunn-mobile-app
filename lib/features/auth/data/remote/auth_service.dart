@@ -5,6 +5,7 @@ import 'package:http/http.dart' as http;
 import 'package:cartunn/core/app_constants.dart';
 import 'package:cartunn/features/auth/data/remote/login_request.dart';
 import 'package:cartunn/features/auth/data/remote/login_dto.dart';
+
 class AuthService {
   String? _token;
 
@@ -13,16 +14,16 @@ class AuthService {
         Uri.parse('${AppConstants.baseUrl}/authentication/sign-in'),
         headers: {"Content-Type": "application/json"},
         body: jsonEncode(
-            LoginRequest(username: username, password: password).toMap()
-        ));
+            LoginRequest(username: username, password: password).toMap()));
     if (response.statusCode == HttpStatus.ok) {
       Map<String, dynamic> json = jsonDecode(response.body);
       final loginDto = LoginDto.fromJson(json);
-      _token = json['token']; 
+      _token = json['token'];
       return loginDto;
     }
+
     return null;
   }
 
-  String? get token => _token; 
+  String? get token => _token;
 }

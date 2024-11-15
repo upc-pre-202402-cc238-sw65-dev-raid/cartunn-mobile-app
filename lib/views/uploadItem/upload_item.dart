@@ -1,8 +1,10 @@
 import 'dart:convert';
-import 'package:cartunn/presentation/widgets/textfield.dart';
+import 'package:cartunn/shared/presentation/widgets/textfield.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:cartunn/features/inventory/domain/entities/product.dart';
+import 'package:cartunn/features/auth/data/remote/auth_service.dart'; 
+import 'package:get_it/get_it.dart';
 
 class UploadItemPage extends StatefulWidget {
   const UploadItemPage({super.key});
@@ -13,6 +15,7 @@ class UploadItemPage extends StatefulWidget {
 
 class UploadItemPageState extends State<UploadItemPage> {
   final _formKey = GlobalKey<FormState>();
+  final AuthService authService = GetIt.I<AuthService>(); 
 
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
@@ -29,11 +32,21 @@ class UploadItemPageState extends State<UploadItemPage> {
         "image": _imageController.text,
       };
 
+     
+      final token = authService.token;
+      if (token == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Please log in to upload items.')),
+        );
+        return;
+      }
+
       try {
         final response = await http.post(
           Uri.parse(url),
           headers: {
             'Content-Type': 'application/json',
+            'Authorization': 'Bearer $token', 
           },
           body: jsonEncode(data),
         );
@@ -42,7 +55,6 @@ class UploadItemPageState extends State<UploadItemPage> {
 
         if (response.statusCode == 201) {
           final product = Product.fromJson(jsonDecode(response.body));
-
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('Item uploaded successfully!')),
           );

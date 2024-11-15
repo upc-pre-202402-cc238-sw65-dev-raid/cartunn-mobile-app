@@ -1,49 +1,47 @@
+import 'package:cartunn/features/orders/presentation/widgets/order_detail_content.dart';
 import 'package:flutter/material.dart';
-import 'package:iconsax/iconsax.dart';
-import 'package:cartunn/views/uploadItem/upload_item.dart';
+import 'package:cartunn/features/orders/domain/entities/order.dart';
+import 'package:cartunn/features/orders/domain/usecases/get_orders_usecase.dart';
+import 'package:cartunn/shared/presentation/widgets/search_input.dart'; 
 import 'package:cartunn/components/draggable_sheet_component.dart';
-import 'package:cartunn/features/inventory/domain/entities/product.dart';
-import 'package:cartunn/features/inventory/domain/usecases/get_products_usecase.dart';
-import 'package:cartunn/features/inventory/presentation/widgets/product_detail_content.dart';
-import 'package:cartunn/shared/presentation/widgets/search_input.dart';
+ 
 
-class InventoryView extends StatefulWidget {
-  final GetProductsUseCase getProductsUseCase;
+class OrdersPage extends StatefulWidget {
+  final GetOrdersUsecase getOrdersUsecase;
 
-  const InventoryView({Key? key, required this.getProductsUseCase})
-      : super(key: key);
+  const OrdersPage({Key? key, required this.getOrdersUsecase}) : super(key: key);
 
   @override
-  InventoryViewState createState() => InventoryViewState();
+  OrdersPageState createState() => OrdersPageState();
 }
 
-class InventoryViewState extends State<InventoryView> {
-  List<Product> products = [];
-  List<Product> filteredProducts = [];
+class OrdersPageState extends State<OrdersPage> {
+  List<Order> orders = [];
+  List<Order> filteredOrders = [];
   TextEditingController searchController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
-    _fetchProducts();
+    fetchOrders();
     searchController.addListener(() {
-      filterProducts();
+      filterOrders();
     });
   }
 
-  Future<void> _fetchProducts() async {
-    final result = await widget.getProductsUseCase.call();
+  Future<void> fetchOrders() async {
+    final fetchedOrders = await widget.getOrdersUsecase.call();
     setState(() {
-      products = result;
-      filteredProducts = products.reversed.toList();
+      orders = fetchedOrders;
+      filteredOrders = orders.reversed.toList();
     });
   }
 
-  void filterProducts() {
+  void filterOrders() {
     String searchText = searchController.text.toLowerCase();
     setState(() {
-      filteredProducts = products.reversed
-          .where((product) => product.title.toLowerCase().contains(searchText))
+      filteredOrders = orders
+          .where((order) => order.name.toLowerCase().contains(searchText))
           .toList();
     });
   }
@@ -59,7 +57,7 @@ class InventoryViewState extends State<InventoryView> {
     return Scaffold(
       appBar: AppBar(
         title: const Text(
-          'Inventory',
+          'Orders',
           style: TextStyle(
             fontSize: 30,
             fontWeight: FontWeight.bold,
@@ -70,11 +68,12 @@ class InventoryViewState extends State<InventoryView> {
         slivers: [
           SliverAppBar(
             title: SearchInput(
-                controller: searchController,
-                hintText: "Write here ...",
-                onChanged: (value) {
-                  filterProducts();
-                }),
+              controller: searchController,
+              hintText: "Search orders...",
+              onChanged: (value) {
+                filterOrders();
+              },
+            ),
             floating: true,
             pinned: true,
             titleSpacing: 0,
@@ -90,7 +89,7 @@ class InventoryViewState extends State<InventoryView> {
             ),
             delegate: SliverChildBuilderDelegate(
               (context, index) {
-                final product = filteredProducts[index];
+                final order = filteredOrders[index];
                 return GestureDetector(
                   onTap: () {
                     showModalBottomSheet(
@@ -107,7 +106,7 @@ class InventoryViewState extends State<InventoryView> {
                             GestureDetector(
                               onTap: () {},
                               child: DraggableSheetComponent(
-                                child: ProductDetailContent(product: product),
+                                child: OrderDetailContent(order: order),
                               ),
                             ),
                           ],
@@ -124,7 +123,7 @@ class InventoryViewState extends State<InventoryView> {
                           child: ClipRRect(
                             borderRadius: BorderRadius.circular(8),
                             child: Image.network(
-                              product.image,
+                              order.imageUrl,
                               fit: BoxFit.cover,
                             ),
                           ),
@@ -132,7 +131,7 @@ class InventoryViewState extends State<InventoryView> {
                         Padding(
                           padding: const EdgeInsets.all(8.0),
                           child: Text(
-                            product.title,
+                            order.name,
                             style: const TextStyle(fontWeight: FontWeight.bold),
                             textAlign: TextAlign.center,
                           ),
@@ -142,47 +141,12 @@ class InventoryViewState extends State<InventoryView> {
                   ),
                 );
               },
-              childCount: filteredProducts.length,
+              childCount: filteredOrders.length,
             ),
           ),
         ],
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () async {
-          final newProduct = await showModalBottomSheet<Product>(
-            context: context,
-            isScrollControlled: true,
-            backgroundColor: Colors.transparent,
-            builder: (context) => GestureDetector(
-              behavior: HitTestBehavior.opaque,
-              onTap: () {
-                Navigator.of(context).pop();
-              },
-              child: Stack(
-                children: [
-                  GestureDetector(
-                    onTap: () {},
-                    child: const DraggableSheetComponent(
-                      child: UploadItemPage(),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          );
-          if (newProduct != null) {
-            setState(() {
-              products.insert(0, newProduct);
-              filterProducts();
-            });
-          }
-        },
-        backgroundColor: const Color(0xFF5766f5),
-        child: const Icon(
-          Iconsax.add,
-          color: Colors.white,
-        ),
-      ),
+      
     );
   }
 }

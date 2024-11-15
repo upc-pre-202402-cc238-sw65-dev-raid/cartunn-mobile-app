@@ -1,6 +1,5 @@
 import 'package:cartunn/features/orders/presentation/widgets/order_detail_content.dart';
 import 'package:flutter/material.dart';
-import 'package:iconsax/iconsax.dart';
 import 'package:cartunn/features/orders/domain/entities/order.dart';
 import 'package:cartunn/features/orders/domain/usecases/get_orders_usecase.dart';
 import 'package:cartunn/shared/presentation/widgets/search_input.dart'; 
@@ -147,16 +146,7 @@ class OrdersPageState extends State<OrdersPage> {
           ),
         ],
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () async {
-          // Implementa aquí la funcionalidad para agregar una nueva orden
-        },
-        backgroundColor: const Color(0xFF5766f5),
-        child: const Icon(
-          Iconsax.add,
-          color: Colors.white,
-        ),
-      ),
+      
     );
   }
 }

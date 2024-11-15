@@ -11,7 +11,7 @@ class OrderRemoteDataSource {
   Future<List<OrderModel>> getOrders() async {
     final token = authService.token;
     if (token == null) {
-      print('Error: El token es null en getOrders'); // Depuración adicional
+      print('Error: El token es null en getOrders');
       throw Exception('No token found. Please login first.');
     }
 

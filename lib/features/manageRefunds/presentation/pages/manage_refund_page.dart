@@ -5,7 +5,7 @@ import 'package:cartunn/features/manageRefunds/domain/usecases/get_products_refu
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:http/http.dart' as http;
-import 'package:cartunn/components/draggable_sheet_component.dart';
+import 'package:cartunn/shared/presentation/widgets/draggable_sheet_component.dart';
 import 'package:cartunn/features/manageRefunds/presentation/widgets/manage_refund_detail_content.dart';
 
 class ManageRefundView extends StatefulWidget {
@@ -44,7 +44,8 @@ class ManageRefundViewState extends State<ManageRefundView> {
     }
   }
 
-  Future<void> _updateRefundStatus(ProductRefund refund, String newStatus) async {
+  Future<void> _updateRefundStatus(
+      ProductRefund refund, String newStatus) async {
     final token = authService.token;
     if (token == null) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -52,7 +53,7 @@ class ManageRefundViewState extends State<ManageRefundView> {
       );
       return;
     }
-    
+
     final url = Uri.parse(
         'https://cartunn.up.railway.app/api/v1/product-refund/${refund.id}');
     final response = await http.put(

@@ -1,4 +1,4 @@
-import 'package:cartunn/components/button.dart';
+import 'package:cartunn/shared/presentation/widgets/button.dart';
 import 'package:cartunn/features/auth/data/remote/auth_service.dart';
 import 'package:flutter/material.dart';
 import 'package:cartunn/features/inventory/domain/entities/product.dart';
@@ -20,11 +20,19 @@ class _ProductDetailContentState extends State<ProductDetailContent> {
   bool _showForm = false;
   final authService = GetIt.I<AuthService>();
   final _formKey = GlobalKey<FormState>();
-  final TextEditingController _idController = TextEditingController();
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
   final TextEditingController _priceController = TextEditingController();
   final TextEditingController _imageController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    _nameController.text = widget.product.title;
+    _descriptionController.text = widget.product.description;
+    _priceController.text = widget.product.price.toString();
+    _imageController.text = widget.product.image;
+  }
 
   Future<void> _updateItem(int productId) async {
     if (_formKey.currentState!.validate()) {
@@ -37,13 +45,16 @@ class _ProductDetailContentState extends State<ProductDetailContent> {
         "price": double.parse(_priceController.text),
         "image": _imageController.text,
       };
+
       final token = authService.token;
       if (token == null) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('No autorizado. Inicia sesión primero.')),
+          const SnackBar(
+              content: Text('No autorizado. Inicia sesión primero.')),
         );
         return;
       }
+
       try {
         final response = await http.put(
           Uri.parse(url),
@@ -60,11 +71,11 @@ class _ProductDetailContentState extends State<ProductDetailContent> {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('Item updated successfully!')),
           );
+
+          Navigator.of(context).pop();
         } else {
           final errorData = jsonDecode(response.body);
-
           final errorMessage = errorData['error'] ?? 'Failed to update item.';
-
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text(errorMessage)),
           );
@@ -80,15 +91,15 @@ class _ProductDetailContentState extends State<ProductDetailContent> {
   }
 
   Future<void> _removeItem(int productId) async {
-      final token = authService.token;
-      if (token == null) {
+    final token = authService.token;
+    if (token == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('No autorizado. Inicia sesión primero.')),
       );
-        return;
-      }
+      return;
+    }
 
-      try {
+    try {
       final response = await http.delete(
         Uri.parse('https://cartunn.up.railway.app/api/v1/products/$productId'),
         headers: {
@@ -103,8 +114,7 @@ class _ProductDetailContentState extends State<ProductDetailContent> {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Item removed successfully!')),
         );
-        // Cierra el DraggableSheetComponent después de eliminar el producto
-        Navigator.pop(context);
+        Navigator.pop(context); // Cierra el modal al eliminar el producto
       } else if (response.statusCode == 404) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Item not found.')),
@@ -123,25 +133,21 @@ class _ProductDetailContentState extends State<ProductDetailContent> {
   }
 
   @override
-  void initState() {
-    super.initState();
-    _nameController.text = widget.product.title;
-    _descriptionController.text = widget.product.description;
-    _priceController.text = widget.product.price.toString();
-    _imageController.text = widget.product.image;
-  }
-
-  @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: _showForm ? _buildForm() : _buildDetails(),
+    return GestureDetector(
+      onTap: () {
+        FocusScope.of(context).unfocus();
+      },
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.all(8.0),
+        child: _showForm ? _buildForm() : _buildDetails(),
+      ),
     );
   }
 
   Widget _buildDetails() {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(32, 0, 32, 0),
+      padding: const EdgeInsets.fromLTRB(32, 0, 32, 16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisAlignment: MainAxisAlignment.center,
@@ -153,7 +159,7 @@ class _ProductDetailContentState extends State<ProductDetailContent> {
               fontWeight: FontWeight.bold,
             ),
           ),
-          const SizedBox(height: 4),
+          const SizedBox(height: 16),
           SizedBox(
             width: double.infinity,
             child: Image.network(
@@ -162,34 +168,28 @@ class _ProductDetailContentState extends State<ProductDetailContent> {
               fit: BoxFit.contain,
             ),
           ),
-          const SizedBox(height: 4),
+          const SizedBox(height: 16),
           Text(
-            'Description',
+            'Description:',
             style: TextStyle(
               fontSize: 16,
               color: Colors.grey[600],
               fontWeight: FontWeight.bold,
             ),
           ),
-          const SizedBox(height: 4),
+          Text(widget.product.description,
+              style: const TextStyle(fontSize: 16)),
+          const SizedBox(height: 16),
           Text(
-            widget.product.description,
-            style: const TextStyle(fontSize: 16),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            'Price',
+            'Price:',
             style: TextStyle(
               fontSize: 16,
               color: Colors.grey[600],
               fontWeight: FontWeight.bold,
             ),
           ),
-          const SizedBox(height: 4),
-          Text(
-            '\$${widget.product.price}',
-            style: const TextStyle(fontSize: 16),
-          ),
+          Text('\$${widget.product.price}',
+              style: const TextStyle(fontSize: 16)),
           const SizedBox(height: 16),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -205,9 +205,7 @@ class _ProductDetailContentState extends State<ProductDetailContent> {
               ),
               IconButton(
                 onPressed: () {
-                  final int productId = widget.product.id;
-                  _removeItem(productId);
-                  Navigator.pop(context);
+                  _removeItem(widget.product.id);
                 },
                 icon: const Icon(Icons.delete),
                 color: Colors.red.shade400,
@@ -220,73 +218,69 @@ class _ProductDetailContentState extends State<ProductDetailContent> {
   }
 
   Widget _buildForm() {
-  return Form(
-    key: _formKey,
-    child: Padding(
-      padding: const EdgeInsets.fromLTRB(32, 0, 32, 0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text(
-            'Update Product',
-            style: TextStyle(
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
+    return Form(
+      key: _formKey,
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'Update Product',
+              style: TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+              ),
             ),
-          ),
-          const SizedBox(height: 16),
-          CustomTextField(
-            controller: _nameController,
-            label: 'Name',
-          ),
-          const SizedBox(height: 8),
-          CustomTextField(
-            controller: _descriptionController,
-            label: 'Description',
-          ),
-          const SizedBox(height: 8),
-          CustomTextField(
-            controller: _priceController,
-            label: 'Price',
-          ),
-          const SizedBox(height: 8),
-          CustomTextField(
-            controller: _imageController,
-            label: 'Image URL',
-          ),
-          const SizedBox(height: 16),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              CustomButton(
-                text: 'Update',
-                buttonColor: const Color(0xFF5766F5),
-                textColor: Colors.white,
-                onPressed: () {
-                  if (_formKey.currentState!.validate()) {
+            const SizedBox(height: 16),
+            CustomTextField(
+              controller: _nameController,
+              label: 'Name',
+            ),
+            const SizedBox(height: 8),
+            CustomTextField(
+              controller: _descriptionController,
+              label: 'Description',
+            ),
+            const SizedBox(height: 8),
+            CustomTextField(
+              controller: _priceController,
+              label: 'Price',
+            ),
+            const SizedBox(height: 8),
+            CustomTextField(
+              controller: _imageController,
+              label: 'Image URL',
+            ),
+            const SizedBox(height: 16),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                CustomButton(
+                  text: 'Update',
+                  buttonColor: const Color(0xFF5766F5),
+                  textColor: Colors.white,
+                  onPressed: () {
                     _updateItem(widget.product.id);
-                    Navigator.pop(context);
-                  }
-                },
-              ),
-              const SizedBox(width: 16),
-              CustomButton(
-                text: 'Cancel',
-                buttonColor: const Color.fromARGB(255, 255, 252, 252),
-                textColor: Colors.black,
-                onPressed: () {
-                  setState(() {
-                    _showForm = false;
-                  });
-                },
-              ),
-            ],
-          )
-        ],
+                  },
+                ),
+                CustomButton(
+                  text: 'Cancel',
+                  buttonColor: Colors.grey.shade300,
+                  textColor: Colors.black,
+                  onPressed: () {
+                    setState(() {
+                      _showForm = false;
+                    });
+                  },
+                ),
+              ],
+            )
+          ],
+        ),
       ),
-    ),
-  );
-}
+    );
+  }
 
   @override
   void dispose() {

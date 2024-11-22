@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:cartunn/views/uploadItem/upload_item.dart';
-import 'package:cartunn/components/draggable_sheet_component.dart';
+import 'package:cartunn/shared/presentation/widgets/draggable_sheet_component.dart';
 import 'package:cartunn/features/inventory/domain/entities/product.dart';
 import 'package:cartunn/features/inventory/domain/usecases/get_products_usecase.dart';
 import 'package:cartunn/features/inventory/presentation/widgets/product_detail_content.dart';
@@ -66,86 +66,92 @@ class InventoryViewState extends State<InventoryView> {
           ),
         ),
       ),
-      body: CustomScrollView(
-        slivers: [
-          SliverAppBar(
-            title: SearchInput(
-                controller: searchController,
-                hintText: "Write here ...",
-                onChanged: (value) {
-                  filterProducts();
-                }),
-            floating: true,
-            pinned: true,
-            titleSpacing: 0,
-            toolbarHeight: 80,
-            leadingWidth: 8,
-          ),
-          SliverGrid(
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
-              crossAxisSpacing: 8,
-              mainAxisSpacing: 8,
-              childAspectRatio: 0.75,
+      body: RefreshIndicator(
+        onRefresh: () async {
+          await _fetchProducts();
+        },
+        child: CustomScrollView(
+          slivers: [
+            SliverAppBar(
+              title: SearchInput(
+                  controller: searchController,
+                  hintText: "Write here ...",
+                  onChanged: (value) {
+                    filterProducts();
+                  }),
+              floating: true,
+              pinned: true,
+              titleSpacing: 0,
+              toolbarHeight: 80,
+              leadingWidth: 8,
             ),
-            delegate: SliverChildBuilderDelegate(
-              (context, index) {
-                final product = filteredProducts[index];
-                return GestureDetector(
-                  onTap: () {
-                    showModalBottomSheet(
-                      context: context,
-                      isScrollControlled: true,
-                      backgroundColor: Colors.transparent,
-                      builder: (context) => GestureDetector(
-                        behavior: HitTestBehavior.opaque,
-                        onTap: () {
-                          Navigator.of(context).pop();
-                        },
-                        child: Stack(
-                          children: [
-                            GestureDetector(
-                              onTap: () {},
-                              child: DraggableSheetComponent(
-                                child: ProductDetailContent(product: product),
+            SliverGrid(
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+                crossAxisSpacing: 8,
+                mainAxisSpacing: 8,
+                childAspectRatio: 0.75,
+              ),
+              delegate: SliverChildBuilderDelegate(
+                (context, index) {
+                  final product = filteredProducts[index];
+                  return GestureDetector(
+                    onTap: () {
+                      showModalBottomSheet(
+                        context: context,
+                        isScrollControlled: true,
+                        backgroundColor: Colors.transparent,
+                        builder: (context) => GestureDetector(
+                          behavior: HitTestBehavior.opaque,
+                          onTap: () {
+                            Navigator.of(context).pop();
+                          },
+                          child: Stack(
+                            children: [
+                              GestureDetector(
+                                onTap: () {},
+                                child: DraggableSheetComponent(
+                                  child: ProductDetailContent(product: product),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      );
+                    },
+                    child: Card(
+                      elevation: 4,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Expanded(
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(8),
+                              child: Image.network(
+                                product.image,
+                                fit: BoxFit.cover,
                               ),
                             ),
-                          ],
-                        ),
-                      ),
-                    );
-                  },
-                  child: Card(
-                    elevation: 4,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Expanded(
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(8),
-                            child: Image.network(
-                              product.image,
-                              fit: BoxFit.cover,
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Text(
+                              product.title,
+                              style:
+                                  const TextStyle(fontWeight: FontWeight.bold),
+                              textAlign: TextAlign.center,
                             ),
                           ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Text(
-                            product.title,
-                            style: const TextStyle(fontWeight: FontWeight.bold),
-                            textAlign: TextAlign.center,
-                          ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
-                  ),
-                );
-              },
-              childCount: filteredProducts.length,
+                  );
+                },
+                childCount: filteredProducts.length,
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () async {

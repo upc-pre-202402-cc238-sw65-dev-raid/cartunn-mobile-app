@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:cartunn/components/button.dart';
+import 'package:cartunn/shared/presentation/widgets/button.dart';
 import 'package:cartunn/shared/presentation/widgets/textfield.dart';
 
 class RemoveItemPage extends StatefulWidget {

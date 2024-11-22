@@ -83,9 +83,39 @@ class OrderDetailContent extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 8),
-          Text(
-            order.status,
-            style: const TextStyle(fontSize: 16),
+          Row(
+            children: [
+              Text(
+                order.status.toUpperCase(),
+                style: TextStyle(
+                    fontSize: 16,
+                    color: order.status == 'initiated'
+                        ? Colors.blue
+                        : order.status == 'processing'
+                            ? Colors.orange
+                            : Colors.green),
+              ),
+              const SizedBox(width: 8),
+              Container(
+                padding: const EdgeInsets.all(4),
+                decoration: BoxDecoration(
+                  color: order.status == 'initiated'
+                      ? Colors.blue
+                      : order.status == 'processing'
+                          ? Colors.orange
+                          : Colors.green,
+                  borderRadius: BorderRadius.circular(4),
+                ),
+                child: Icon(
+                  order.status == 'initiated'
+                      ? Icons.timer
+                      : order.status == 'processing'
+                          ? Icons.cached
+                          : Icons.check,
+                  color: Colors.white,
+                ),
+              ),
+            ],
           ),
         ],
       ),
